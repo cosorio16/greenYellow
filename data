@@ -1,0 +1,139 @@
+1 / 0 / 0;
+1 / 0 / 1;
+1 / 0 / 2;
+1 / 0 / 3;
+1 / 0 / 4;
+1 / 0 / 5;
+1 / 0 / 6;
+1 / 0 / 7;
+1 / 0 / 8;
+
+fetch("http://192.168.0.105/scada-main/trends/form", {
+  headers: {
+    accept: "*/*",
+    "accept-language": "es-419,es;q=0.9",
+    authorization: "Basic YWRtaW46YWRtaW4=",
+    "content-type": "text/plain;charset=UTF-8",
+    "x-requested-with": "XMLHttpRequest",
+    cookie: "user_language=; x-logout=0; x-auth=; x-fail-cnt=0; x-login=1",
+    Referer: "http://192.168.0.105/scada-main",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+  },
+  body: "data=%7B%22id%22%3A35%7D",
+  method: "POST",
+});
+
+const wsUrl =
+  "ws://192.168.0.105/scada-vis/objects/ws?auth=admin:6a928cdadf514361a6b3da790cf8a901";
+
+const socket = new WebSocket(wsUrl);
+
+socket.onopen = function () {
+  console.log("Conectado al WebSocket");
+};
+
+socket.onmessage = function (event) {
+  const data = JSON.parse(event.data);
+  console.log("Mensaje recibido:", data);
+};
+
+socket.onerror = function (error) {
+  console.error("Error en WebSocket:", error);
+};
+
+socket.onclose = function () {
+  console.log("Conexión WebSocket cerrada");
+};
+
+fetch("http://192.168.0.105/scada-vis/trends/fetch", {
+  headers: {
+    accept: "application/json, text/javascript, */*; q=0.01",
+    "accept-language": "es-419,es;q=0.9",
+    authorization: "Basic YWRtaW46YWRtaW4=",
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "x-requested-with": "XMLHttpRequest",
+    cookie: "user_language=; x-logout=0; x-auth=; x-fail-cnt=0; x-login=1",
+    Referer: "http://192.168.0.105/scada-vis/trends?id=1&mode=day",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+  },
+  body: "data=%7B%22dates_curr%22%3A%7B%22start%22%3A%7B%22year%22%3A2024%2C%22day%22%3A22%2C%22month%22%3A10%7D%2C%22end%22%3A%7B%22year%22%3A2024%2C%22day%22%3A23%2C%22month%22%3A10%7D%7D%2C%22id%22%3A1%2C%22dates_prev%22%3A%7B%22start%22%3A%7B%22year%22%3A2024%2C%22day%22%3A22%2C%22month%22%3A10%7D%2C%22end%22%3A%7B%22year%22%3A2024%2C%22day%22%3A23%2C%22month%22%3A10%7D%7D%7D",
+  method: "POST",
+});
+
+const bodyData = {
+  dates_curr: {
+    start: {
+      year: 2024,
+      day: 22,
+      month: 10,
+    },
+    end: {
+      year: 2024,
+      day: 23,
+      month: 10,
+    },
+  },
+  id: 137,
+  dates_prev: {
+    start: {
+      year: 2024,
+      day: 22,
+      month: 10,
+    },
+    end: {
+      year: 2024,
+      day: 23,
+      month: 10,
+    },
+  },
+};
+
+// Convierte el objeto a una cadena JSON y luego lo codifica
+const bodyEncoded = `data=${encodeURIComponent(JSON.stringify(bodyData))}`;
+
+fetch("http://192.168.0.105/scada-vis/trends/fetch", {
+  headers: {
+    accept: "application/json, text/javascript, */*; q=0.01",
+    "accept-language": "es-419,es;q=0.9",
+    authorization: "Basic YWRtaW46YWRtaW4=",
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "x-requested-with": "XMLHttpRequest",
+    cookie: "user_language=; x-logout=0; x-auth=; x-fail-cnt=0; x-login=1",
+    Referer: "http://192.168.0.105/scada-vis/trends?id=1&mode=day",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+  },
+  body: bodyEncoded,
+  method: "POST",
+})
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
+  })
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((error) => {
+    console.error("There was a problem with the fetch operation:", error);
+  });
+
+const username = "admin";
+const password = "admin";
+const credentials = `${username}:${password}`;
+const encodedCredentials = btoa(credentials);
+
+fetch("http://192.168.0.110/scada-vis/trends/fetch", {
+  headers: {
+    accept: "application/json, text/javascript, */*; q=0.01",
+    "accept-language": "es-419,es;q=0.9",
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "x-requested-with": "XMLHttpRequest",
+    cookie:
+      "user_language=; x-login=1; x-auth=admin:d60b43bbc0dc3624cc03b876e9550ded6e314de0b0897615325589bfe6a3f777",
+    Referer: "http://192.168.0.110/scada-vis/trends?id=243&mode=day",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+  },
+  body: "data=%7B%22dates_curr%22%3A%7B%22start%22%3A%7B%22year%22%3A2024%2C%22day%22%3A23%2C%22month%22%3A10%7D%2C%22end%22%3A%7B%22year%22%3A2024%2C%22day%22%3A24%2C%22month%22%3A10%7D%7D%2C%22id%22%3A243%2C%22dates_prev%22%3A%7B%22start%22%3A%7B%22year%22%3A2024%2C%22day%22%3A23%2C%22month%22%3A10%7D%2C%22end%22%3A%7B%22year%22%3A2024%2C%22day%22%3A24%2C%22month%22%3A10%7D%7D%7D",
+  method: "POST",
+});
