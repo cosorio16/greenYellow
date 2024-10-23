@@ -48,13 +48,7 @@ function Dashboard() {
         <Line
           data={{
             labels: [
-              "Domingo",
-              "Lunes",
-              "Martes",
-              "Miercoles",
-              "Jueves",
-              "Viernes",
-              "Sabado",
+              
             ],
             datasets: [
               { label: "Energia Total", data: [67, 80, 57, 47, 57, 47, 67] },
