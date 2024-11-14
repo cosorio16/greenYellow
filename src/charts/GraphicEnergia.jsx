@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import {
   Chart as ChartJS,
   LinearScale,
@@ -17,8 +18,9 @@ import {
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
+import { totalAccumulatedEnergy } from "../utils/influxDB.js";
 import chartGenerator from "../utils/chartGenerator.js";
-import { getDataDB } from "../utils/influxDB.js";
+import trends from "../data/trends.js";
 
 ChartJS.register(
   LinearScale,
@@ -38,49 +40,37 @@ ChartJS.register(
   scales
 );
 
-import { useState, useEffect, useRef } from "react";
-import useData from "../store/dataState.js";
-import trends from "../data/trends.js";
-import Calendar from "../components/Calendar.jsx";
-
-function Voltajes() {
+function GraphicEnergia() {
   const chartRef = useRef(null);
-  const { floor, subView, db, toggleDB } = useData();
   const [dataLoaded, setDataLoaded] = useState(null);
   const [error, setError] = useState(null);
+  const DB = false;
+  //local
+  const fechaStart = "2024-11-07 00:00:00";
 
-  const [voltajes, setVoltajes] = useState([1]);
-  const [voltajes2, setVoltajes2] = useState([2]);
-  const [voltajes3, setVoltajes3] = useState([3]);
+  //influx
+  const min = "2024-10-20T00:00:00Z";
+  const max = "2024-11-06T00:00:00Z";
 
-  const [meterType, setMeterType] = useState("Sensor");
-
-  const dataMapping = {
-    5: { 0: 1, 1: 2, 2: 1, 3: 2, 4: 3, 5: 7 },
-    7: { 0: 3, 1: 4, 2: 4, 3: 5, 4: 6, 5: 8 },
-  };
+  const [voltajes, setVoltajes] = useState([]);
+  const [voltajes2, setVoltajes2] = useState([]);
+  const [voltajes3, setVoltajes3] = useState([]);
 
   const piso5 = ["1/0/1", "1/0/11", "1/0/21"];
   const piso7 = ["1/0/3", "1/0/13", "1/0/23"];
 
   const [pisoSelected, setPisoSelected] = useState(piso5);
 
-  useEffect(() => {
-    floor == "5" ? setPisoSelected(piso5) : setPisoSelected(piso7);
-  }, [floor]);
-
-  const DB = false;
-  const fechaStart = "2024-11-07 00:00:00";
-
   const dataGraphicTemplate = {
+    title: false,
     numVarPhysics: 1,
-    namesAxisY: ["Voltaje (v)"],
+    namesAxisY: ["Energia (kwh)", "Corriente (A)", "Temperatura (°C)"],
     positionAxisY: [0],
     numDataByVarPhysics: [3],
     data: [],
-    namesVar: [["Voltaje 1", "Voltaje 2", "Voltaje 3"]],
-    type: [0],
-    minRangeAxisX: 5,
+    namesVar: [["L1", "L2", "L3", "Total"]],
+    type: [1],
+    minRangeAxisX: 60 * 24,
     opacity: [0.2],
     zoom: true,
   };
@@ -88,20 +78,20 @@ function Voltajes() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const voltajeData = await getDataDB(
-          "Voltaje",
+        const voltajeData = await totalAccumulatedEnergy(
+          "Energia Activa",
           1,
-          "2024-10-12T00:00:00Z",
-          "2024-10-12T01:00:00Z",
-          "Medidor"
+          min,
+          max,
+          1
         );
-
         setDataLoaded({
           ...dataGraphicTemplate,
           data: [voltajeData],
         });
-      } catch (e) {
-        setError(e);
+      } catch (error) {
+        console.error("Error al obtener datos de la base de datos:", error);
+        setError(true);
       }
     }
 
@@ -110,10 +100,7 @@ function Voltajes() {
     } else {
       setDataLoaded({
         ...dataGraphicTemplate,
-        data: [
-          [[voltajes], [voltajes2], [voltajes3]],
-
-        ],
+        data: [[[voltajes], [voltajes2], [voltajes3]]],
       });
     }
   }, [DB]);
@@ -202,26 +189,19 @@ function Voltajes() {
 
   // useEffect(() => {
   //   updateChart();
-  // }, [pisoSelected]);
+  // }, []);
 
   if (!dataLoaded) {
-    return (
-      <div className="lds-ellipsis min-w-full min-h-32 flex items-center justify-center m-auto  left-1/2">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-    );
+    return <div>Cargando...</div>;
   }
 
+  if (error) {
+    console.log("Error DB");
+  }
   const resultGraphics = chartGenerator(dataLoaded, fechaStart, DB);
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-4 justify-between">
-        <Calendar></Calendar>
-      </div>
       <Chart
         onDoubleClick={() => {
           chartRef.current ? chartRef.current.resetZoom() : "";
@@ -234,4 +214,4 @@ function Voltajes() {
   );
 }
 
-export default Voltajes;
+export default GraphicEnergia;
