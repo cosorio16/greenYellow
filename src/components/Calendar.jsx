@@ -110,7 +110,7 @@ function Calendar() {
     );
   };
 
-  console.log(selected);
+
 
   return (
     <>

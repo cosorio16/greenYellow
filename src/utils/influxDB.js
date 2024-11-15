@@ -30,7 +30,6 @@ async function getDataDB(nameData, numberdata, timeMin, timeMax, type) {
       body: queryDB
     }
   )
-  let dataGet = await response
   .then(r => r.json())
   .then(res => {
     if(type == 'Medidor') {
@@ -42,17 +41,19 @@ async function getDataDB(nameData, numberdata, timeMin, timeMax, type) {
           totalToAddResult.push({x:e.time,y:e[`${nameData}`]})
         }
       })
-      result[result.length] = totalToAddResult
+      if (res[0]) result[result.length] = totalToAddResult
+      else result = []
     } else if (type == 'Sensor'){
       res.forEach((e) => {
         result[0] = !result[0] ? [] : result[0]
         result[0].push({x:e.time, y:e[`${nameData}`] || 0})
       })
     }
-    return result
+    if(res[0]) return result
+    else return []
   })
   .catch(error => console.error('Error:', error))
-  return dataGet
+  return response
 }
 
 async function totalAccumulatedEnergy(nameData, numberdata, timeMin, timeMax) {
@@ -60,7 +61,7 @@ async function totalAccumulatedEnergy(nameData, numberdata, timeMin, timeMax) {
   let result = [];
   let totalToAddResult = [];
 
-  queryDB =`SELECT LAST("${nameData}") - FIRST("${nameData}") AS "consumo" FROM edificio WHERE "nombre"='Medidor ${numberdata}' AND time >= '${timeMin}' AND time < '${timeMax}' GROUP BY time(24h), "circuito"`
+  queryDB = `SELECT LAST("${nameData}") - FIRST("${nameData}") AS "consumo" FROM edificio WHERE "nombre"='Medidor ${numberdata}' AND time >= '${timeMin}' AND time < '${timeMax}' GROUP BY time(24h), "circuito"`
 
   let response = await fetch( "http://74.208.139.232:1880/greenyellow", {
   method: 'POST',
@@ -77,7 +78,8 @@ async function totalAccumulatedEnergy(nameData, numberdata, timeMin, timeMax) {
         totalToAddResult.push({x: e.time, y:e.consumo})
       }
     })
-    result[result.length] = totalToAddResult
+    if (res[0]) result[result.length] = totalToAddResult
+    else result = []
     return result
   })
   .catch(error => console.error('Error:', error))

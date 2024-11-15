@@ -1,6 +1,7 @@
 import Headernav from "../components/Headernav";
 import Voltajes from "../charts/Voltajes";
 import GraphicEnergia from "../charts/GraphicEnergia";
+import AppGraphics from "../charts/Graphic";
 
 function Chartview() {
   return (
@@ -14,7 +15,10 @@ function Chartview() {
               <Voltajes />
             </div>
             <div className="aspect-auto max-w-[1200px] w-full border p-4">
-              <GraphicEnergia></GraphicEnergia>
+              <Voltajes />
+            </div>
+            <div className="aspect-auto max-w-[1200px] w-full border p-4">
+              <Voltajes />
             </div>
             <div className="aspect-auto max-w-[1200px] w-full border p-4">
               <Voltajes />

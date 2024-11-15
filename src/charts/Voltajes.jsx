@@ -48,79 +48,170 @@ function Voltajes() {
 
   const [dataLoaded, setDataLoaded] = useState(null);
 
-  const [voltajes, setVoltajes] = useState([1]);
-  const [voltajes2, setVoltajes2] = useState([2]);
-  const [voltajes3, setVoltajes3] = useState([3]);
+  const [voltajes, setVoltajes] = useState([1, 2, 3, 4, 5, 6, 5]);
+  const [voltajes2, setVoltajes2] = useState([3, 4, 5, 6, 7, 8]);
+  const [voltajes3, setVoltajes3] = useState([9, 3, 4, 5, 4, 2]);
 
   const piso5 = ["1/0/1", "1/0/11", "1/0/21"];
   const piso7 = ["1/0/3", "1/0/13", "1/0/23"];
 
-  const [pisoSelected, setPisoSelected] = useState(piso5);
+  const [pisoSelected, setPisoSelected] = useState(floor == 5 ? piso5 : piso7);
 
   useEffect(() => {
-    floor == "5" ? setPisoSelected(piso5) : setPisoSelected(piso7);
+    setPisoSelected(floor == 5 ? piso5 : piso7);
   }, [floor]);
 
-  const DB = false;
+  const [showDays, setShoDays] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(0);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [fechaStart, setFechaStart] = useState(currentDate);
 
-  const dataGraphicTemplate = {
-    numVarPhysics: 1,
-    namesAxisY: ["Voltaje (v)"],
-    positionAxisY: [0],
-    numDataByVarPhysics: [3],
-    data: [],
-    namesVar: [["Voltaje 1", "Voltaje 2", "Voltaje 3"]],
-    type: [0],
-    minRangeAxisX: 5,
-    opacity: [0.2],
-    zoom: true,
+  const week = ["D", "L", "M", "M", "J", "V", "S"];
+  const months = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+
+  const [selected, setSelected] = useState([{}]);
+  const [isSelected, setIsSelected] = useState(false);
+  const [start, setStart] = useState(null);
+  const [resolution, setResolution] = useState(5);
+
+  const month = currentDate.getMonth();
+  const year = currentDate.getFullYear();
+  const desfase = new Date(year, month, 1).getDay();
+
+  useEffect(() => {
+    setSelected([
+      {
+        year: currentDate.getFullYear(),
+        mes: currentDate.getMonth(),
+        dia: currentDate.getDate(),
+      },
+    ]);
+  }, []);
+
+  const calendar = useMemo(() => {
+    const days = [];
+
+    for (let i = -desfase + 1; days.length < 42; i++) {
+      days.push({
+        dia: new Date(year, month, i).getDate(),
+        mes: new Date(year, month, i).getMonth(),
+        year: new Date(year, month, i).getFullYear(),
+      });
+    }
+
+    return days;
+  }, [month, year]);
+
+  const handleNextMonth = () => {
+    const date = new Date(currentDate);
+    date.setMonth(currentDate.getMonth() + 1);
+    setCurrentDate(date);
+  };
+
+  const handleBackMonth = () => {
+    const date = new Date(currentDate);
+    date.setMonth(currentDate.getMonth() - 1);
+    setCurrentDate(date);
+  };
+
+  const handleSetMonth = (i) => {
+    const date = new Date(currentDate);
+    date.setMonth(i);
+    setCurrentDate(date);
+  };
+
+  const handleMouseDown = (date) => {
+    setIsSelected(true);
+    setStart(date);
+    setSelected([date]);
+  };
+
+  const handleMouseEnter = (date) => {
+    if (isSelected && start) {
+      const range = [start, date].sort((a, b) => {
+        if (a.year !== b.year) return a.year - b.year;
+        if (a.mes !== b.mes) return a.mes - b.mes;
+        return a.dia - b.dia;
+      });
+
+      const datesSelecteds = [];
+      let current = new Date(range[0].year, range[0].mes, range[0].dia);
+      const end = new Date(range[1].year, range[1].mes, range[1].dia);
+
+      while (current <= end) {
+        datesSelecteds.push({
+          year: current.getFullYear(),
+          mes: current.getMonth(),
+          dia: current.getDate(),
+        });
+        current.setDate(current.getDate() + 1);
+      }
+
+      setSelected(datesSelecteds);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsSelected(false);
+    setShoDays(false);
+
+    if (selected.length > 0) {
+      const firstDate = selected[0];
+      const newDate = new Date(firstDate.year, firstDate.mes, firstDate.dia);
+      setCurrentDate(newDate);
+    }
+  };
+
+  const handleIsSelected = (date) => {
+    return selected.some(
+      (selected) =>
+        selected.year === date.year &&
+        selected.mes === date.mes &&
+        selected.dia === date.dia
+    );
   };
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const voltajeData = await getDataDB(
-          "Voltaje",
-          1,
-          "2024-10-12T00:00:00Z",
-          "2024-10-12T01:00:00Z",
-          "Medidor"
-        );
+    const date = `${selected[0]?.year}-${selected[0]?.mes + 1}-${
+      selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : `${selected[0]?.dia}`
+    } 00:00:00`;
 
-        setDataLoaded({
-          ...dataGraphicTemplate,
-          data: [voltajeData],
-        });
-      } catch (e) {
-        throw new Error(e);
-      }
-    }
-
-    if (DB) {
-      fetchData();
-    } else {
-      setDataLoaded({
-        ...dataGraphicTemplate,
-        data: [[[voltajes], [voltajes2], [voltajes3]]],
-      });
-    }
-  }, [DB]);
+    setResolution(selected.length > 1 ? 60 : 5);
+    setFechaStart(date);
+  }, [selected]);
 
   const getMeterData = async (gp) => {
-    const id = trends.filter((t, index) => t.object == localbus.encodega(gp))[0]
-      .id;
+    const id = trends.filter((t) => t.object == localbus.encodega(gp))[0].id;
 
     const bodyData = {
+      resolution: resolution * 60,
       dates_curr: {
         start: {
-          year: 2024,
-          day: 10,
-          month: 11,
+          year: selected[0]?.year,
+          day: selected[0]?.dia,
+          month: selected[0]?.mes + 1,
         },
         end: {
-          year: 2024,
-          day: 11,
-          month: 11,
+          year: selected[selected.length - 1].year,
+          day: `${
+            selected.length == 1
+              ? selected[selected.length - 1].dia + 1
+              : selected[selected.length - 1].dia
+          }`,
+          month: selected[selected.length - 1].mes + 1,
         },
       },
       id: id,
@@ -180,138 +271,63 @@ function Voltajes() {
       setVoltajes(r1.current.data);
       setVoltajes2(r2.current.data);
       setVoltajes3(r3.current.data);
-
-      console.log("R", r1, r2, r3);
-      console.log("R", r1.current.data, r2.current.data, r3.current.data);
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   };
 
   // useEffect(() => {
   //   updateChart();
-  // }, [pisoSelected]);
+  // }, [pisoSelected, selected]);
 
-  const [showDays, setShoDays] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(0);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [fechaStart, setFechaStart] = useState(currentDate);
-  const options = ["Dia", "Semana", "Mes"];
+  const DB = false;
 
-  const week = ["D", "L", "M", "M", "J", "V", "S"];
-  const months = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ];
-
-  const [selected, setSelected] = useState([]);
-  const [isSelected, setIsSelected] = useState(false);
-  const [start, setStart] = useState(null);
-
-  const month = currentDate.getMonth();
-  const year = currentDate.getFullYear();
-  const day = currentDate.getDate();
-  const desfase = new Date(year, month, 1).getDay();
-
-  const calendar = useMemo(() => {
-    const days = [];
-
-    for (let i = -desfase + 1; days.length < 42; i++) {
-      days.push({
-        dia: new Date(year, month, i).getDate(),
-        mes: new Date(year, month, i).getMonth(),
-        year: new Date(year, month, i).getFullYear(),
-      });
-    }
-
-    return days;
-  }, [month, year]);
-
-  const handleNextMonth = () => {
-    const date = new Date(currentDate);
-    date.setMonth(currentDate.getMonth() + 1);
-    setCurrentDate(date);
+  const dataGraphicTemplate = {
+    numVarPhysics: 1,
+    namesAxisY: ["Voltaje (v)"],
+    positionAxisY: [0],
+    numDataByVarPhysics: [3],
+    data: [],
+    namesVar: [["Voltaje 1", "Voltaje 2", "Voltaje 3"]],
+    type: [0],
+    minRangeAxisX: resolution,
+    opacity: [0.2],
+    zoom: true,
   };
-
-  const handleBackMonth = () => {
-    const date = new Date(currentDate);
-    date.setMonth(currentDate.getMonth() - 1);
-    setCurrentDate(date);
-  };
-
-  const handleSetMonth = (i) => {
-    const date = new Date(currentDate);
-    date.setMonth(i);
-    setCurrentDate(date);
-  };
-
-  const handleMouseDown = (date) => {
-    setIsSelected(true);
-    setStart(date);
-    setSelected([date]);
-  };
-
-  const handleMouseEnter = (date) => {
-    if (isSelected && start) {
-      const range = [start, date].sort((a, b) => {
-        if (a.mes !== b.mes) return a.mes - b.mes;
-        return a.dia - b.dia;
-      });
-      let datesSelecteds = [];
-      let mes = range[0].mes;
-      let dia = range[0].dia;
-
-      while (
-        mes < range[1].mes ||
-        (mes === range[1].mes && dia <= range[1].dia)
-      ) {
-        datesSelecteds.push({ mes, dia });
-        dia++;
-        if (dia > 31) {
-          dia = 1;
-          mes++;
-        }
-      }
-
-      setSelected(datesSelecteds);
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsSelected(false);
-    const date = new Date(year, selected[0]?.mes, selected[0]?.dia);
-    setCurrentDate(date);
-  };
-
-  const handleIsSelected = (date) => {
-    return selected.some(
-      (selected) => selected.mes === date.mes && selected.dia === date.dia
-    );
-  };
-
-  // useEffect(() => {
-  //   const date = `${year}-${selected[0]?.mes + 1}-${
-  //     selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : `${selected[0]?.dia}`
-  //   } 00:00:00`;
-
-  //   setFechaStart(date);
-  // }, [selected]);
-
-  // console.log(fechaStart);
 
   useEffect(() => {
-    console.log(currentDate);
-  }, [currentDate]);
+    async function fetchData() {
+      try {
+        const voltajeData = await getDataDB(
+          "Voltaje",
+          1,
+          `${selected[0]?.year}-${selected[0]?.mes + 1}-${
+            selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
+          }T00:00:00Z`,
+          `${selected[0]?.year}-${selected[0]?.mes + 1}-${
+            selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
+          }T23:59:00Z`,
+          "Medidor"
+        );
+
+        setDataLoaded({
+          ...dataGraphicTemplate,
+          data: [voltajeData],
+        });
+      } catch (e) {
+        setDataLoaded(null);
+      }
+    }
+
+    if (DB) {
+      fetchData();
+    } else {
+      setDataLoaded({
+        ...dataGraphicTemplate,
+        data: [[voltajes, voltajes2, voltajes3]],
+      });
+    }
+  }, [DB, selected, pisoSelected, floor, currentDate]);
 
   if (!dataLoaded) {
     return (
@@ -325,6 +341,11 @@ function Voltajes() {
   }
 
   const resultGraphics = chartGenerator(dataLoaded, fechaStart, DB);
+
+  const createCalendar = () => {
+    const today = new Date();
+    
+  };
 
   return (
     <div className="w-full flex flex-col gap-2">
@@ -352,11 +373,19 @@ function Voltajes() {
                 <path d="M3 10h18" />
               </g>
             </svg>
-            Seleccionar Fecha
+            {selected.length > 1
+              ? `${selected[0]?.dia}  ${months[selected[0]?.mes]}, ${
+                  selected[0]?.year
+                } - ${selected[selected.length - 1].dia}  ${
+                  months[selected[selected.length - 1].mes]
+                }, ${selected[selected.length - 1].year}`
+              : `${selected[0]?.dia}  ${months[selected[0]?.mes]}, ${
+                  selected[0]?.year
+                }`}
           </div>
           {showDays && (
             <>
-              <div className="min-w-full w-[150%] absolute top-full left-0 bg-white border rounded flex  items-center gap-4 p-0 justify-center">
+              <div className=" w-[250px] absolute top-full left-0 bg-white border rounded flex  items-center gap-4 justify-center">
                 <div>
                   <div className="flex justify-between w-full items-center py-2 font-semibold text-sm text-yellow-800">
                     <button onClick={() => handleBackMonth()}>
@@ -372,7 +401,10 @@ function Voltajes() {
                         />
                       </svg>
                     </button>
-                    <h1 onClick={() => setSelectedOption(3)}>
+                    <h1
+                      className="cursor-pointer  active:scale-95 transition-all"
+                      onClick={() => setSelectedOption(3)}
+                    >
                       {months[month]} {year}
                     </h1>
                     <button onClick={() => handleNextMonth()}>
@@ -393,7 +425,7 @@ function Voltajes() {
                     {week.map((w, i) => (
                       <p
                         key={i}
-                        className={`w-full text-center text-sm p-1 border-y font-semibold text-yellow-900 m-1`}
+                        className={`w-full text-center text-sm p-1 border-y font-semibold text-yellow-900 m-2`}
                       >
                         {w}
                       </p>
@@ -407,20 +439,20 @@ function Voltajes() {
                         className={`hover:bg-yellow-200 hover:text-gray-950 cursor-pointer text-center transition-all  flex items-center justify-center aspect-square rounded-full w-5 h-5 p-4 ${
                           handleIsSelected(d) && "bg-yellow-300"
                         } 
-                 
-                    ${
-                      selectedOption == 1 &&
-                      d <= selected[0]?.dia - 7 &&
-                      "bg-yellow-300"
-                    } 
-
-                    ${
-                      selectedOption == 2 &&
-                      calendar[i].mes == month &&
-                      "bg-yellow-300"
-                    }
-
-                   `}
+                   
+                      ${
+                        selectedOption == 1 &&
+                        d <= selected[0]?.dia - 7 &&
+                        "bg-yellow-300"
+                      } 
+  
+                      ${
+                        selectedOption == 2 &&
+                        calendar[i].mes == month &&
+                        "bg-yellow-300"
+                      }
+  
+                     `}
                       >
                         {d.dia}
                       </p>
@@ -432,7 +464,7 @@ function Voltajes() {
           )}
 
           {showDays && selectedOption == 3 && (
-            <div className="min-w-full w-[150%] absolute top-full left-0 bg-white border rounded gap-2 p-2  grid grid-cols-2 shadow justifyitemc">
+            <div className="w-[300px] absolute top-full left-0 bg-white border rounded gap-2 p-2  grid grid-cols-2 shadow justify-items-center">
               {months.map((m, i) => (
                 <button
                   onClick={() => {
