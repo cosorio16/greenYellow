@@ -43,13 +43,13 @@ ChartJS.register(
   scales
 );
 
-function Test() {
+function Voltajes() {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
   const { floor, db } = useData();
 
-  const piso5 = ["1/0/1", "1/0/11", "1/0/21"];
-  const piso7 = ["1/0/3", "1/0/13", "1/0/23"];
+  const piso5 = ["1/0/31", "1/0/41", "1/0/51"];
+  const piso7 = ["1/0/33", "1/0/43", "1/0/53"];
   const [pisoSelected, setPisoSelected] = useState(floor);
 
   const [data, setData] = useState([]);
@@ -163,7 +163,7 @@ function Test() {
   const fetchDataDB = async () => {
     try {
       const voltajeData = await getDataDB(
-        "Voltaje",
+        "Corriente",
         1,
         `${selected[0]?.year}-${selected[0]?.mes + 1}-${
           selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
@@ -189,7 +189,7 @@ function Test() {
   };
 
   useEffect(() => {
-    // updateChart();
+    updateChart();
     fetchDataDB();
   }, [pisoSelected]);
 
@@ -200,7 +200,7 @@ function Test() {
       positionAxisY: [0],
       numDataByVarPhysics: [3],
       data: [[data, data2, data3]],
-      namesVar: [["Voltaje 1", "Voltaje 2", "Voltaje 3"]],
+      namesVar: [["L1", "L2", "L3"]],
       type: [0],
       minRangeAxisX: 5,
       opacity: [0.2],
@@ -229,4 +229,4 @@ function Test() {
   );
 }
 
-export default Test;
+export default Voltajes;

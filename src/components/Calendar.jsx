@@ -93,6 +93,7 @@ const Calendar = forwardRef((props, ref) => {
   const handleMouseUp = () => {
     setIsSelected(false);
     setShoDays(false);
+    props.mouseUp?.(isSelected);
   };
 
   useImperativeHandle(ref, () => ({
@@ -163,3 +164,4 @@ const Calendar = forwardRef((props, ref) => {
 });
 
 export default Calendar;
+Calendar.displayName = "Calendar";

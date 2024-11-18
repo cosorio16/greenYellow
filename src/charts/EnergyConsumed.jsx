@@ -43,7 +43,7 @@ ChartJS.register(
   scales
 );
 
-function Test() {
+function EnergyConsumed() {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
   const { floor, db } = useData();
@@ -55,6 +55,7 @@ function Test() {
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
+  const [data4, setData4] = useState([]);
 
   const [selected, setSelected] = useState([
     {
@@ -163,7 +164,7 @@ function Test() {
   const fetchDataDB = async () => {
     try {
       const voltajeData = await getDataDB(
-        "Voltaje",
+        "Energia Activa",
         1,
         `${selected[0]?.year}-${selected[0]?.mes + 1}-${
           selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
@@ -181,6 +182,7 @@ function Test() {
       setData(voltajeData?.[0]);
       setData2(voltajeData?.[1]);
       setData3(voltajeData?.[2]);
+      setData4(voltajeData?.[3]);
 
       console.log(voltajeData);
     } catch (e) {
@@ -196,11 +198,11 @@ function Test() {
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
       numVarPhysics: 1,
-      namesAxisY: ["Voltaje (v)"],
+      namesAxisY: ["Energia Consumida (Kwh)"],
       positionAxisY: [0],
-      numDataByVarPhysics: [3],
-      data: [[data, data2, data3]],
-      namesVar: [["Voltaje 1", "Voltaje 2", "Voltaje 3"]],
+      numDataByVarPhysics: [4],
+      data: [[data, data2, data3, data4]],
+      namesVar: [["L1", "L2", "L3", "Total"]],
       type: [0],
       minRangeAxisX: 5,
       opacity: [0.2],
@@ -229,4 +231,4 @@ function Test() {
   );
 }
 
-export default Test;
+export default EnergyConsumed;
