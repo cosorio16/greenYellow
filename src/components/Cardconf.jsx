@@ -143,7 +143,7 @@ function Cardconf() {
 
     const encodedData = `data=${encodeURIComponent(JSON.stringify(data))}`;
 
-    await fetch("http://192.168.0.110/scada-main/general/datetime-save", {
+    await fetch(`http://${window.location.host}/scada-main/general/datetime-save`, {
       method: "POST",
       headers: {
         accept: "*/*",
@@ -151,7 +151,7 @@ function Cardconf() {
         "content-type": "text/plain;charset=UTF-8",
         "x-requested-with": "XMLHttpRequest",
       },
-      referrer: "http://192.168.0.110/scada-main/",
+      referrer: `http://${window.location.host}/scada-main/`,
       referrerPolicy: "strict-origin-when-cross-origin",
       body: encodedData,
       mode: "cors",

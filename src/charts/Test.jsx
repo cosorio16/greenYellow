@@ -1,24 +1,11 @@
-import useData from "../store/dataState";
-import trends from "../data/trends";
 import { useState, useEffect } from "react";
+import useData from "../store/dataState";
 import { Chart as ChartJS } from "chart.js/auto";
-import { Line } from "react-chartjs-2";
-import data from "../data/fetch";
-import Calendar from "../components/Calendar";
+import { Line, Chart } from "react-chartjs-2";
+import trends from "../data/trends";
 
-function Voltaje() {
+function Test() {
   const { floor } = useData();
-
-  const days = [
-    "Domingo",
-    "Lunes",
-    "Martes",
-    "Miercoles",
-    "Jueves",
-    "Viernes",
-    "Sabado",
-  ];
-
   const times = [
     "00:05",
     "00:10",
@@ -310,83 +297,42 @@ function Voltaje() {
     "24:00",
   ];
 
-  const month = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-  ];
-
-  const [rangeSelect, setRangeSelect] = useState(times);
-  const [daysMoth, setDayMonth] = useState(month);
-
-  const today = new Date();
-  const todayWeek = today.getDay();
-  const todayDay = today.getDate();
-  const todayMonth = today.getMonth() + 1;
-
-  const pastWeek = new Date(today);
-  pastWeek.setDate(today.getDate() - 7);
-
-  const pastWeekDay = pastWeek.getDate();
-  const pastWeekMonth = pastWeek.getMonth() + 1;
-  const [week, setWeek] = useState(days);
-
-  // const options = {
-  //   scales: {
-  //     x: {
-  //       ticks: {
-  //         callback: function (value, index) {
-  //           return index % 3 === 0 ? times[index] : "";
-  //         },
-  //       },
-  //     },
-  //   },
-  // };
-
-  // const diasEnMes = new Date(2024, 0 + 1, 0).getDate();
-
-  // const diasDelMes = [];
-  // for (let i = 1; i <= diasEnMes; i++) {
-  //   diasDelMes.push(i);
-  // }
-
-  useEffect(() => {
-    if (rangeSelect == "Dia") {
-      setRangeSelect(times);
-    } else if (rangeSelect == "Semana") {
-      setRangeSelect(week);
-    } else if (rangeSelect == "Mes") {
-      setRangeSelect(daysMoth);
-    }
-  }, [rangeSelect]);
-
-  const piso5 = ["1/0/1", "1/0/11", "1/0/21"];
-  const piso7 = ["1/0/3", "1/0/13", "1/0/23"];
-
-  const [pisoSelected, setPisoSelected] = useState(piso5);
-
-  useEffect(() => {
-    floor == "5" ? setPisoSelected(piso5) : setPisoSelected(piso7);
-  }, [floor]);
-
   const [voltajes, setVoltajes] = useState([]);
   const [voltajes2, setVoltajes2] = useState([]);
   const [voltajes3, setVoltajes3] = useState([]);
 
+  const piso5 = ["1/0/1", "1/0/11", "1/0/21"];
+  const piso7 = ["1/0/3", "1/0/13", "1/0/23"];
+
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selected, setSelected] = useState([
+    {
+      year: currentDate.getFullYear(),
+      mes: currentDate.getMonth(),
+      dia: currentDate.getDate(),
+    },
+  ]);
+
+  const [pisoSelected, setPisoSelected] = useState(floor == 5 ? piso5 : piso7);
+
+  useEffect(() => {
+    setPisoSelected(floor == 5 ? piso5 : piso7);
+  }, [floor]);
+
   const getMeterData = async (gp) => {
-    const id = trends.filter((t, index) => t.object == localbus.encodega(gp))[0]
-      .id;
+    const id = trends.filter((t) => t.object == localbus.encodega(gp))[0].id;
 
     const bodyData = {
       dates_curr: {
         start: {
-          year: 2024,
-          day: 5,
-          month: 11,
+          year: selected[0]?.year,
+          day: selected[0]?.dia,
+          month: selected[0]?.mes + 1,
         },
         end: {
-          year: 2024,
-          day: 6,
-          month: 11,
+          year: selected[selected.length - 1].year,
+          day: selected[selected.length - 1].dia + 1,
+          month: selected[selected.length - 1].mes + 1,
         },
       },
       id: id,
@@ -406,7 +352,7 @@ function Voltaje() {
 
     try {
       const response = await fetch(
-        "http://192.168.0.110/scada-vis/trends/fetch",
+        `http://${window.location.host}/scada-vis/trends/fetch`,
         {
           headers: {
             accept: "application/json, text/javascript, */*; q=0.01",
@@ -415,7 +361,7 @@ function Voltaje() {
             "x-requested-with": "XMLHttpRequest",
             cookie:
               "user_language=; x-logout=0; x-auth=; x-fail-cnt=0; x-login=1",
-            Referer: "http://192.168.0.105/scada-vis/trends?id=1&mode=day",
+            Referer: `http://${window.location.host}/scada-vis/trends?id=1&mode=day`,
             "Referrer-Policy": "strict-origin-when-cross-origin",
           },
           body: `data=${encodeURIComponent(JSON.stringify(bodyData))}`,
@@ -446,57 +392,38 @@ function Voltaje() {
       setVoltajes(r1.current.data);
       setVoltajes2(r2.current.data);
       setVoltajes3(r3.current.data);
-
-      console.log("R", r1, r2, r3);
-      console.log("R", r1.current.data, r2.current.data, r3.current.data);
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
     }
   };
 
   useEffect(() => {
-    setWeek([...days.slice(todayWeek), ...days.slice(0, todayWeek)]);
-  }, []);
+    updateChart();
+  }, [floor]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-between items-center">
-        <Calendar></Calendar>
-      </div>
+    <>
       <Line
         data={{
-          labels: rangeSelect,
+          labels: times,
           datasets: [
             {
-              label: ["Voltaje L1"],
-              data: data.m1,
-              fill: "origin",
+              label: [],
+              data: voltajes,
             },
             {
-              label: ["Voltaje L2"],
-              data: data.m2,
-              fill: "origin",
+              label: [],
+              data: voltajes2,
             },
             {
-              label: ["Voltaje L3"],
-              data: data.m3,
-              fill: "origin",
+              label: [],
+              data: voltajes3,
             },
           ],
         }}
-        options={{
-          responsive: true,
-          interaction: {
-            mode: "index",
-            intersect: false,
-          },
-        }}
       ></Line>
-      <button className="border px-4 py-2 text-white bg-gray-800 hover:scale-105 transition-all m-auto rounded">
-        Descargar Datos
-      </button>
-    </div>
+    </>
   );
 }
 
-export default Voltaje;
+export default Test;
