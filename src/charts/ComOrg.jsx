@@ -43,19 +43,18 @@ ChartJS.register(
   scales
 );
 
-function EnergyConsumed({ id }) {
+function ComOrg({ id }) {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
   const { floor, db } = useData();
 
-  const piso5 = ["1/0/1", "1/0/11", "1/0/21"];
-  const piso7 = ["1/0/3", "1/0/13", "1/0/23"];
+  const piso5 = ["2/0/41", "2/0/42", "2/0/43", "3/0/1"];
+  const piso7 = ["2/0/44", "2/0/45", "2/0/46", "3/0/2"];
   const [pisoSelected, setPisoSelected] = useState(floor);
 
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
-  const [data4, setData4] = useState([]);
 
   const [selected, setSelected] = useState([
     {
@@ -164,8 +163,8 @@ function EnergyConsumed({ id }) {
   const fetchDataDB = async () => {
     try {
       const voltajeData = await getDataDB(
-        "Energia Activa",
-        `${id}`,
+        "Compuestos Organicos Volatiles",
+      `${id}`,
         `${selected[0]?.year}-${selected[0]?.mes + 1}-${
           selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
         }T00:00:00Z`,
@@ -176,13 +175,12 @@ function EnergyConsumed({ id }) {
             ? `0${selected[selected.length - 1]?.dia}`
             : selected[selected.length - 1]?.dia
         }T23:59:59Z`,
-        "Medidor"
+        "Sensor"
       );
 
       setData(voltajeData?.[0]);
       setData2(voltajeData?.[1]);
       setData3(voltajeData?.[2]);
-      setData4(voltajeData?.[3]);
     } catch (e) {
       console.log(e);
     }
@@ -195,16 +193,16 @@ function EnergyConsumed({ id }) {
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
       numVarPhysics: 1,
-      namesAxisY: ["Energia (Kwh)"],
+      namesAxisY: ["Presencia"],
       positionAxisY: [0],
-      numDataByVarPhysics: [4],
-      data: [[data, data2, data3, data4]],
-      namesVar: [["L1", "L2", "L3", "Total"]],
+      numDataByVarPhysics: [1],
+      data: [[data, data2, data3]],
+      namesVar: [["Presencia 1"]],
       type: [0],
       minRangeAxisX: 5,
       opacity: [0.2],
       zoom: true,
-      title: "Energia Time",
+      title: "Presencia",
     };
 
     return chartGenerator(dataGraphicTemplate, fechaStart, db);
@@ -227,4 +225,4 @@ function EnergyConsumed({ id }) {
   );
 }
 
-export default EnergyConsumed;
+export default ComOrg;

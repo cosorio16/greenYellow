@@ -43,7 +43,7 @@ ChartJS.register(
   scales
 );
 
-function Voltajes() {
+function Voltajes({ id }) {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
   const { floor, db } = useData();
@@ -164,7 +164,7 @@ function Voltajes() {
     try {
       const voltajeData = await getDataDB(
         "Voltaje",
-        1,
+        `${id}`,
         `${selected[0]?.year}-${selected[0]?.mes + 1}-${
           selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
         }T00:00:00Z`,
@@ -181,17 +181,14 @@ function Voltajes() {
       setData(voltajeData?.[0]);
       setData2(voltajeData?.[1]);
       setData3(voltajeData?.[2]);
-
-      console.log(voltajeData);
     } catch (e) {
       console.log(e);
     }
   };
 
   useEffect(() => {
-    updateChart();
-    fetchDataDB();
-  }, [pisoSelected]);
+    db ? fetchDataDB() : updateChart();
+  }, [pisoSelected, db]);
 
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
@@ -200,17 +197,16 @@ function Voltajes() {
       positionAxisY: [0],
       numDataByVarPhysics: [3],
       data: [[data, data2, data3]],
-      namesVar: [["L1", "L2", "L3"]],
+      namesVar: [["L1", "L2", "L3", "Total"]],
       type: [0],
       minRangeAxisX: 5,
       opacity: [0.2],
       zoom: true,
+      title: "Voltajes",
     };
 
-    return chartGenerator(dataGraphicTemplate, fechaStart, true);
+    return chartGenerator(dataGraphicTemplate, fechaStart, db);
   }, [data]);
-
-  console.log(resultGraphics);
 
   return (
     <div className="flex flex-col gap-2 ">

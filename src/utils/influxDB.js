@@ -14,13 +14,14 @@ async function getDataDB(nameData, numberdata, timeMin, timeMax, type) {
   let totalToAddResult = [];
   let result = [];
 
-  if(type == 'Medidor'){ // -----------Cosulta a medidor
-    queryDB = `SELECT
-    "${nameData}"
+  if(type == 'Medidor' && nameData != 'Energia Activa'){ // -----------Cosulta a medidor
+    queryDB = `SELECT "${nameData}"
     FROM edificio WHERE "nombre"='${type} ${numberdata}' AND time > '${timeMin}' AND time < '${timeMax}' GROUP BY "circuito" tz('America/Bogota')`
+  } else if (type == 'Medidor' && nameData == 'Energia Activa') {
+  queryDB = `SELECT LAST("${nameData}") AS "Energia Activa" 
+  FROM edificio WHERE "nombre"='Medidor ${numberdata}' AND time >= '${timeMin}' AND time < '${timeMax}' GROUP BY time(1h), "circuito"`
   } else if (type == 'Sensor') { // ------------------Cosulta a sensores
-    queryDB = `SELECT 
-    "${nameData}"
+    queryDB = `SELECT "${nameData}"
     FROM edificio WHERE "nombre"='${type} ${numberdata}' AND time > '${timeMin}' AND time < '${timeMax}' tz('America/Bogota')`
   }
 

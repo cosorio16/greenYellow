@@ -56,7 +56,9 @@ function MeterSelect() {
             <div
               key={i}
               onClick={() => updateSubView(i)}
-              className={`hover:bg-yellow-100 transition-all py-2 cursor-pointer border-b px-4 ${n == sectionsNames[subView] && "bg-yellow-300"}`}
+              className={`hover:bg-yellow-100 transition-all py-2 cursor-pointer border-b px-4 ${
+                i == subView && "bg-yellow-300"
+              }`}
             >
               {n}
             </div>

@@ -181,17 +181,14 @@ function Test() {
       setData(voltajeData?.[0]);
       setData2(voltajeData?.[1]);
       setData3(voltajeData?.[2]);
-
-      console.log(voltajeData);
     } catch (e) {
       console.log(e);
     }
   };
 
   useEffect(() => {
-    // updateChart();
-    fetchDataDB();
-  }, [pisoSelected]);
+    db ? fetchDataDB() : updateChart();
+  }, [pisoSelected, db]);
 
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
@@ -207,10 +204,8 @@ function Test() {
       zoom: true,
     };
 
-    return chartGenerator(dataGraphicTemplate, fechaStart, true);
+    return chartGenerator(dataGraphicTemplate, fechaStart, db);
   }, [data]);
-
-  console.log(resultGraphics);
 
   return (
     <div className="flex flex-col gap-2 ">

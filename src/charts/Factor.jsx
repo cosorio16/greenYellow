@@ -43,7 +43,7 @@ ChartJS.register(
   scales
 );
 
-function Factor() {
+function Factor({id}) {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
   const { floor, db } = useData();
@@ -164,7 +164,7 @@ function Factor() {
     try {
       const voltajeData = await getDataDB(
         "Factor de Potencia",
-        1,
+        `${id}`,
         `${selected[0]?.year}-${selected[0]?.mes + 1}-${
           selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
         }T00:00:00Z`,
@@ -182,35 +182,35 @@ function Factor() {
       setData2(voltajeData?.[1]);
       setData3(voltajeData?.[2]);
 
-      console.log(voltajeData);
+   
     } catch (e) {
       console.log(e);
     }
   };
 
   useEffect(() => {
-    // updateChart();
-    fetchDataDB();
-  }, [pisoSelected]);
+    db ? fetchDataDB() : updateChart();
+  }, [pisoSelected, db]);
 
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
       numVarPhysics: 1,
-      namesAxisY: ["Voltaje (v)"],
+      namesAxisY: ["Factor de Potencia"],
       positionAxisY: [0],
       numDataByVarPhysics: [3],
       data: [[data, data2, data3]],
-      namesVar: [["L1", "L2", "L3"]],
+      namesVar: [["L1", "L2", "L3", "Total"]],
       type: [0],
       minRangeAxisX: 5,
       opacity: [0.2],
       zoom: true,
+      title: 'Factor de Potencia'
     };
 
-    return chartGenerator(dataGraphicTemplate, fechaStart, true);
+ return chartGenerator(dataGraphicTemplate, fechaStart, db);
   }, [data]);
 
-  console.log(resultGraphics);
+
 
   return (
     <div className="flex flex-col gap-2 ">
