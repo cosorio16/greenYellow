@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import useData from "../store/dataState";
 import { Chart as ChartJS } from "chart.js/auto";
 import { Line, Chart } from "react-chartjs-2";
 import trends from "../data/trends";
+import Calendar from "../components/Calendar";
 
 function Test() {
+  const calendarRef = useRef(null);
   const { floor } = useData();
   const times = [
     "00:05",
@@ -399,10 +401,12 @@ function Test() {
 
   useEffect(() => {
     updateChart();
-  }, [floor]);
+    console.log("Selected changed, updating chart", selected);
+  }, [selected]);
 
   return (
-    <>
+    <div className="flex flex-col gap-2 ">
+      <Calendar ref={calendarRef} onDateSelect={(date) => setSelected(date)} />
       <Line
         data={{
           labels: times,
@@ -422,7 +426,7 @@ function Test() {
           ],
         }}
       ></Line>
-    </>
+    </div>
   );
 }
 
