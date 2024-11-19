@@ -3,7 +3,7 @@ import Floorselect from "./Floorselect";
 import useData from "../store/dataState";
 
 function Cardconf() {
-  const { floor } = useData();
+  const { floor, db, toggleDB } = useData();
 
   const optionsConf = [
     "Medidor 1",
@@ -143,20 +143,23 @@ function Cardconf() {
 
     const encodedData = `data=${encodeURIComponent(JSON.stringify(data))}`;
 
-    await fetch(`http://${window.location.host}/scada-main/general/datetime-save`, {
-      method: "POST",
-      headers: {
-        accept: "*/*",
-        "accept-language": "es-419,es;q=0.9",
-        "content-type": "text/plain;charset=UTF-8",
-        "x-requested-with": "XMLHttpRequest",
-      },
-      referrer: `http://${window.location.host}/scada-main/`,
-      referrerPolicy: "strict-origin-when-cross-origin",
-      body: encodedData,
-      mode: "cors",
-      credentials: "include",
-    });
+    await fetch(
+      `http://${window.location.host}/scada-main/general/datetime-save`,
+      {
+        method: "POST",
+        headers: {
+          accept: "*/*",
+          "accept-language": "es-419,es;q=0.9",
+          "content-type": "text/plain;charset=UTF-8",
+          "x-requested-with": "XMLHttpRequest",
+        },
+        referrer: `http://${window.location.host}/scada-main/`,
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: encodedData,
+        mode: "cors",
+        credentials: "include",
+      }
+    );
   };
 
   return (
@@ -257,6 +260,82 @@ function Cardconf() {
           Guardar
         </button>
       )}
+
+      <div className=" p-6 flex flex-col gap-2 bg-gray-50 rounded">
+        <p className="text-2xl">Configuración de gráficas</p>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-8">
+            <p className="min-w-fit w-56  rounded py-2 font-medium flex items-center gap-4">
+              <svg
+                className="text-yellow-300"
+                width="25"
+                height="25"
+                viewBox="0 0 24 24"
+              >
+                <g
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4m0-4h.01" />
+                </g>
+              </svg>
+              Ver Datos Locales
+            </p>
+            <label
+              onClick={() => toggleDB()}
+              className="flex cursor-pointer select-none items-center"
+            >
+              <div className="relative">
+                <div className="block h-8 w-14 rounded-full bg-gray-200"></div>
+                <div
+                  className={`dot absolute top-1 h-6 w-6 rounded-full transition-all ${
+                    db ? "left-1 bg-white  " : "right-1 bg-yellow-300"
+                  }`}
+                ></div>
+              </div>
+            </label>
+          </div>
+          <div className="flex items-center gap-8">
+            <p className="min-w-fit w-56 flex items-center gap-4 font-medium">
+              <svg
+                className="text-yellow-300"
+                width="25"
+                height="25"
+                viewBox="0 0 24 24"
+              >
+                <g
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4m0-4h.01" />
+                </g>
+              </svg>
+              Ver Datos De Nube
+            </p>
+            <label
+              onClick={() => toggleDB()}
+              className="flex cursor-pointer select-none items-center"
+            >
+              <div className="relative">
+                <div className="block h-8 w-14 rounded-full bg-gray-200"></div>
+                <div
+                  className={`dot absolute top-1 h-6 w-6 rounded-full transition-all ${
+                    db ? "right-1 bg-yellow-300" : "left-1 bg-white"
+                  }`}
+                ></div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

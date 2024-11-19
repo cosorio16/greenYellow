@@ -3,7 +3,7 @@ import Calendar from "../components/Calendar";
 import useData from "../store/dataState";
 import trends from "../data/trends";
 import chartGenerator from "../utils/chartGenerator";
-import { totalAccumulatedEnergy } from "../utils/influxDB";
+import { getDataDB } from "../utils/influxDB";
 import { Chart } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
 
@@ -46,11 +46,23 @@ ChartJS.register(
 function Energy({ id }) {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
-  const { floor, db } = useData();
+  const { floor, db, subView } = useData();
 
-  const piso5 = ["1/0/1", "1/0/11", "1/0/21"];
-  const piso7 = ["1/0/3", "1/0/13", "1/0/23"];
-  const [pisoSelected, setPisoSelected] = useState(floor);
+  const dataMapping = {
+    5: {
+      0: [126, 127, 128, 129],
+      1: [130, 131, 132, 133],
+    },
+    7: {
+      0: [
+     134,
+     135,
+     136,
+     137,
+      ],
+      1: [130, 131, 132, 133],
+    },
+  };
 
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
@@ -72,10 +84,6 @@ function Energy({ id }) {
   );
 
   useEffect(() => {
-    setPisoSelected(floor == 5 ? piso5 : piso7);
-  }, [floor]);
-
-  useEffect(() => {
     const date = `${selected[0]?.year}-${selected[0]?.mes + 1}-${
       selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
     } 00:00:00`;
@@ -87,6 +95,7 @@ function Energy({ id }) {
     const id = trends.filter((t) => t.object == localbus.encodega(gp))[0].id;
 
     const bodyData = {
+      resolution: 86400,
       dates_curr: {
         start: {
           year: selected[0]?.year,
@@ -148,9 +157,9 @@ function Energy({ id }) {
   const updateChart = async () => {
     try {
       const [r1, r2, r3] = await Promise.all([
-        getMeterData(pisoSelected[0]),
-        getMeterData(pisoSelected[1]),
-        getMeterData(pisoSelected[2]),
+        getMeterData(dataMapping[floor][subView][0]),
+        getMeterData(dataMapping[floor][subView][1]),
+        getMeterData(dataMapping[floor][subView][2]),
       ]);
 
       setData(r1.current.data);
@@ -163,7 +172,7 @@ function Energy({ id }) {
 
   const fetchDataDB = async () => {
     try {
-      const voltajeData = await totalAccumulatedEnergy(
+      const voltajeData = await getDataDB(
         "Energia Activa",
         `${id}`,
         `${selected[0]?.year}-${selected[0]?.mes + 1}-${
@@ -175,7 +184,8 @@ function Energy({ id }) {
           selected[selected.length - 1]?.dia < 10
             ? `0${selected[selected.length - 1]?.dia}`
             : selected[selected.length - 1]?.dia
-        }T23:59:59Z`
+        }T23:59:59Z`,
+        "Medidor"
       );
 
       setData(voltajeData?.[0]);
@@ -186,9 +196,10 @@ function Energy({ id }) {
       console.log(e);
     }
   };
+
   useEffect(() => {
     db ? fetchDataDB() : updateChart();
-  }, [pisoSelected, db]);
+  }, [floor, db, subView]);
 
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
@@ -199,7 +210,7 @@ function Energy({ id }) {
       data: [[data, data2, data3, data4]],
       namesVar: [["L1", "L2", "L3", "Total"]],
       type: [1],
-      minRangeAxisX: 5,
+      minRangeAxisX: db ? 5 : 1440,
       opacity: [0.2],
       zoom: true,
       title: "Energia",

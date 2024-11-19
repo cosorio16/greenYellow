@@ -46,11 +46,18 @@ ChartJS.register(
 function EnergyConsumed({ id }) {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
-  const { floor, db } = useData();
+  const { floor, db, subView } = useData();
 
-  const piso5 = ["1/0/1", "1/0/11", "1/0/21"];
-  const piso7 = ["1/0/3", "1/0/13", "1/0/23"];
-  const [pisoSelected, setPisoSelected] = useState(floor);
+  const dataMapping = {
+    5: {
+      0: ["1/0/121", "1/0/131", "1/0/141"],
+      1: ["1/0/122", "1/0/132", "1/0/142"],
+    },
+    7: {
+      0: ["1/0/123", "1/0/133", "1/0/143"],
+      1: ["1/0/124", "1/0/134", "1/0/144"],
+    },
+  };
 
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
@@ -70,10 +77,6 @@ function EnergyConsumed({ id }) {
       selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
     } 00:00:00`
   );
-
-  useEffect(() => {
-    setPisoSelected(floor == 5 ? piso5 : piso7);
-  }, [floor]);
 
   useEffect(() => {
     const date = `${selected[0]?.year}-${selected[0]?.mes + 1}-${
@@ -148,9 +151,9 @@ function EnergyConsumed({ id }) {
   const updateChart = async () => {
     try {
       const [r1, r2, r3] = await Promise.all([
-        getMeterData(pisoSelected[0]),
-        getMeterData(pisoSelected[1]),
-        getMeterData(pisoSelected[2]),
+        getMeterData(dataMapping[floor][subView][0]),
+        getMeterData(dataMapping[floor][subView][1]),
+        getMeterData(dataMapping[floor][subView][2]),
       ]);
 
       setData(r1.current.data);
@@ -190,7 +193,7 @@ function EnergyConsumed({ id }) {
 
   useEffect(() => {
     db ? fetchDataDB() : updateChart();
-  }, [pisoSelected, db]);
+  }, [floor, db, subView]);
 
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
@@ -204,7 +207,7 @@ function EnergyConsumed({ id }) {
       minRangeAxisX: 5,
       opacity: [0.2],
       zoom: true,
-      title: "Energia Time",
+      title: "Energia Linea",
     };
 
     return chartGenerator(dataGraphicTemplate, fechaStart, db);

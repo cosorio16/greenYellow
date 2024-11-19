@@ -3,7 +3,7 @@ import Floorselect from "../components/Floorselect";
 import MeterSelect from "../components/MeterSelect";
 
 function Headernav() {
-  const { updateView, view, toggleDB, db } = useData();
+  const { updateView, view } = useData();
 
   const handleView = () => {
     view == 2 ? updateView(3) : updateView(2);
@@ -388,12 +388,6 @@ function Headernav() {
           </button>
           <button className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all">
             Descargar Datos
-          </button>
-          <button
-            onClick={() => toggleDB()}
-            className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all"
-          >
-            Datos {db ? "Base de Datos" : "Locales"}
           </button>
         </div>
       </div>

@@ -46,15 +46,22 @@ ChartJS.register(
 function CO2({ id }) {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
-  const { floor, db } = useData();
+  const { floor, db, subView } = useData();
 
-  const piso5 = ["2/0/41", "2/0/42", "2/0/43", "3/0/1"];
-  const piso7 = ["2/0/44", "2/0/45", "2/0/46", "3/0/2"];
-  const [pisoSelected, setPisoSelected] = useState(floor);
+  const dataMapping = {
+    5: {
+      2: "2/0/1",
+      3: "2/0/2",
+      4: "2/0/3",
+    },
+    7: {
+      2: "2/0/4",
+      3: "2/0/5",
+      4: "2/0/6",
+    },
+  };
 
   const [data, setData] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
 
   const [selected, setSelected] = useState([
     {
@@ -69,10 +76,6 @@ function CO2({ id }) {
       selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
     } 00:00:00`
   );
-
-  useEffect(() => {
-    setPisoSelected(floor == 5 ? piso5 : piso7);
-  }, [floor]);
 
   useEffect(() => {
     const date = `${selected[0]?.year}-${selected[0]?.mes + 1}-${
@@ -146,15 +149,11 @@ function CO2({ id }) {
 
   const updateChart = async () => {
     try {
-      const [r1, r2, r3] = await Promise.all([
-        getMeterData(pisoSelected[0]),
-        getMeterData(pisoSelected[1]),
-        getMeterData(pisoSelected[2]),
+      const [r1] = await Promise.all([
+        getMeterData(dataMapping[floor][subView]),
       ]);
 
       setData(r1.current.data);
-      setData2(r2.current.data);
-      setData3(r3.current.data);
     } catch (e) {
       console.log(e);
     }
@@ -179,8 +178,6 @@ function CO2({ id }) {
       );
 
       setData(voltajeData?.[0]);
-      setData2(voltajeData?.[1]);
-      setData3(voltajeData?.[2]);
     } catch (e) {
       console.log(e);
     }
@@ -188,21 +185,21 @@ function CO2({ id }) {
 
   useEffect(() => {
     db ? fetchDataDB() : updateChart();
-  }, [pisoSelected, db]);
+  }, [floor, db, subView]);
 
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
       numVarPhysics: 1,
-      namesAxisY: ["Presencia"],
+      namesAxisY: ["CO2"],
       positionAxisY: [0],
       numDataByVarPhysics: [1],
-      data: [[data, data2, data3]],
-      namesVar: [["Presencia 1"]],
+      data: [[data]],
+      namesVar: [["CO2"]],
       type: [0],
       minRangeAxisX: 5,
       opacity: [0.2],
       zoom: true,
-      title: "Presencia",
+      title: "CO2",
     };
 
     return chartGenerator(dataGraphicTemplate, fechaStart, db);

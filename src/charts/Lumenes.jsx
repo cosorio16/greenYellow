@@ -43,25 +43,17 @@ ChartJS.register(
   scales
 );
 
-function Potency({ id }) {
+function Lums({ id }) {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
   const { floor, db, subView } = useData();
 
   const dataMapping = {
-    5: {
-      0: ["1/0/61", "1/0/71", "1/0/81"],
-      1: ["1/0/62", "1/0/72", "1/0/82"],
-    },
-    7: {
-      0: ["1/0/63", "1/0/73", "1/0/83"],
-      1: ["1/0/64", "1/0/74", "1/0/84"],
-    },
+    5: "3/2/1",
+    7: "3/2/2",
   };
 
   const [data, setData] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
 
   const [selected, setSelected] = useState([
     {
@@ -149,15 +141,11 @@ function Potency({ id }) {
 
   const updateChart = async () => {
     try {
-      const [r1, r2, r3] = await Promise.all([
-        getMeterData(dataMapping[floor][subView][0]),
-        getMeterData(dataMapping[floor][subView][1]),
-        getMeterData(dataMapping[floor][subView][2]),
+      const [r1] = await Promise.all([
+        getMeterData(dataMapping[floor]),
       ]);
 
       setData(r1.current.data);
-      setData2(r2.current.data);
-      setData3(r3.current.data);
     } catch (e) {
       console.log(e);
     }
@@ -166,7 +154,7 @@ function Potency({ id }) {
   const fetchDataDB = async () => {
     try {
       const voltajeData = await getDataDB(
-        "Potencia Activa",
+        "Lumenes",
         `${id}`,
         `${selected[0]?.year}-${selected[0]?.mes + 1}-${
           selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
@@ -178,12 +166,10 @@ function Potency({ id }) {
             ? `0${selected[selected.length - 1]?.dia}`
             : selected[selected.length - 1]?.dia
         }T23:59:59Z`,
-        "Medidor"
+        "Sensor"
       );
 
       setData(voltajeData?.[0]);
-      setData2(voltajeData?.[1]);
-      setData3(voltajeData?.[2]);
     } catch (e) {
       console.log(e);
     }
@@ -191,21 +177,21 @@ function Potency({ id }) {
 
   useEffect(() => {
     db ? fetchDataDB() : updateChart();
-  }, [subView, db, floor]);
+  }, [floor, db, subView]);
 
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
       numVarPhysics: 1,
-      namesAxisY: ["Potencia Activa (KvA)"],
+      namesAxisY: ["Lumenes"],
       positionAxisY: [0],
-      numDataByVarPhysics: [3],
-      data: [[data, data2, data3]],
-      namesVar: [["L1", "L2", "L3", "Total"]],
+      numDataByVarPhysics: [1],
+      data: [[data]],
+      namesVar: [["Lumenes"]],
       type: [0],
       minRangeAxisX: 5,
       opacity: [0.2],
       zoom: true,
-      title: "Potencia Activa",
+      title: "Lumenes",
     };
 
     return chartGenerator(dataGraphicTemplate, fechaStart, db);
@@ -228,4 +214,4 @@ function Potency({ id }) {
   );
 }
 
-export default Potency;
+export default Lums;

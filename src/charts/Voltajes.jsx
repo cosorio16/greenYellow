@@ -46,11 +46,18 @@ ChartJS.register(
 function Voltajes({ id }) {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
-  const { floor, db } = useData();
+  const { floor, db, subView } = useData();
 
-  const piso5 = ["1/0/1", "1/0/11", "1/0/21"];
-  const piso7 = ["1/0/3", "1/0/13", "1/0/23"];
-  const [pisoSelected, setPisoSelected] = useState(floor);
+  const dataMapping = {
+    5: {
+      0: ["1/0/1", "1/0/11", "1/0/21"],
+      1: ["1/0/2", "1/0/12", "1/0/22"],
+    },
+    7: {
+      0: ["1/0/3", "1/0/13", "1/0/23"],
+      1: ["1/0/4", "1/0/14", "1/0/24"],
+    },
+  };
 
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
@@ -70,9 +77,6 @@ function Voltajes({ id }) {
     } 00:00:00`
   );
 
-  useEffect(() => {
-    setPisoSelected(floor == 5 ? piso5 : piso7);
-  }, [floor]);
 
   useEffect(() => {
     const date = `${selected[0]?.year}-${selected[0]?.mes + 1}-${
@@ -147,9 +151,9 @@ function Voltajes({ id }) {
   const updateChart = async () => {
     try {
       const [r1, r2, r3] = await Promise.all([
-        getMeterData(pisoSelected[0]),
-        getMeterData(pisoSelected[1]),
-        getMeterData(pisoSelected[2]),
+        getMeterData(dataMapping[floor][subView][0]),
+        getMeterData(dataMapping[floor][subView][1]),
+        getMeterData(dataMapping[floor][subView][2]),
       ]);
 
       setData(r1.current.data);
@@ -188,7 +192,7 @@ function Voltajes({ id }) {
 
   useEffect(() => {
     db ? fetchDataDB() : updateChart();
-  }, [pisoSelected, db]);
+  }, [subView, db, floor]);
 
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {

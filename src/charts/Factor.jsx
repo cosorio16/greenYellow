@@ -43,14 +43,21 @@ ChartJS.register(
   scales
 );
 
-function Factor({id}) {
+function Factor({ id }) {
   const chartRef = useRef(null);
   const calendarRef = useRef(null);
-  const { floor, db } = useData();
+  const { floor, db, subView } = useData();
 
-  const piso5 = ["1/0/181", "1/0/191", "1/0/201"];
-  const piso7 = ["1/0/183", "1/0/193", "1/0/203"];
-  const [pisoSelected, setPisoSelected] = useState(floor);
+  const dataMapping = {
+    5: {
+      0: ["1/0/181", "1/0/191", "1/0/201"],
+      1: ["1/0/182", "1/0/192", "1/0/202"],
+    },
+    7: {
+      0: ["1/0/183", "1/0/193", "1/0/203"],
+      1: ["1/0/184", "1/0/194", "1/0/204"],
+    },
+  };
 
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
@@ -69,10 +76,6 @@ function Factor({id}) {
       selected[0]?.dia < 10 ? `0${selected[0]?.dia}` : selected[0]?.dia
     } 00:00:00`
   );
-
-  useEffect(() => {
-    setPisoSelected(floor == 5 ? piso5 : piso7);
-  }, [floor]);
 
   useEffect(() => {
     const date = `${selected[0]?.year}-${selected[0]?.mes + 1}-${
@@ -147,9 +150,9 @@ function Factor({id}) {
   const updateChart = async () => {
     try {
       const [r1, r2, r3] = await Promise.all([
-        getMeterData(pisoSelected[0]),
-        getMeterData(pisoSelected[1]),
-        getMeterData(pisoSelected[2]),
+        getMeterData(dataMapping[floor][subView][0]),
+        getMeterData(dataMapping[floor][subView][1]),
+        getMeterData(dataMapping[floor][subView][2]),
       ]);
 
       setData(r1.current.data);
@@ -181,8 +184,6 @@ function Factor({id}) {
       setData(voltajeData?.[0]);
       setData2(voltajeData?.[1]);
       setData3(voltajeData?.[2]);
-
-   
     } catch (e) {
       console.log(e);
     }
@@ -190,7 +191,7 @@ function Factor({id}) {
 
   useEffect(() => {
     db ? fetchDataDB() : updateChart();
-  }, [pisoSelected, db]);
+  }, [subView, db, floor]);
 
   let resultGraphics = useMemo(() => {
     let dataGraphicTemplate = {
@@ -204,13 +205,11 @@ function Factor({id}) {
       minRangeAxisX: 5,
       opacity: [0.2],
       zoom: true,
-      title: 'Factor de Potencia'
+      title: "Factor de Potencia",
     };
 
- return chartGenerator(dataGraphicTemplate, fechaStart, db);
+    return chartGenerator(dataGraphicTemplate, fechaStart, db);
   }, [data]);
-
-
 
   return (
     <div className="flex flex-col gap-2 ">
