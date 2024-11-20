@@ -38,9 +38,13 @@ function chartGenerator(dataGraphic, fechaStart, DB) {
       } else {
         // Caso: Datos generados localmente
         const localData = dataGraphic.data[index]?.[idx] || [];
+        const oneMin = 60000; // 1min expresado en timestampt en milisegundos equivale a 60000ms
+        const minOneDay = 1440; // cantidad de minutos que tiene un dia
         localData.forEach((value, i) => {
           dataVars[index][idx].push({
-            x: dateTimeStart + ((i + 1) * 60000 * dataGraphic.minRangeAxisX),
+            x: dataGraphic.minRangeAxisX >= minOneDay
+              ? dateTimeStart + (i * oneMin * dataGraphic.minRangeAxisX)
+              : dateTimeStart + ((i + 1) * oneMin * dataGraphic.minRangeAxisX),
             y: value,
           });
         });
