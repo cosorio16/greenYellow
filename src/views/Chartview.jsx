@@ -37,7 +37,7 @@ function Chartview() {
 
   return (
     <div className="w-full min-h-screen flex flex-col">
-      {/* <Headernav></Headernav> */}
+      <Headernav></Headernav>
       <main className="flex flex-col bg-gray-100 grow pt-40 p-5">
         <div className="flex flex-col gap-4 w-full">
           <div className="flex justify-between items-center w-full"></div>

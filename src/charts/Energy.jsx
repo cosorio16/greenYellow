@@ -50,17 +50,12 @@ function Energy({ id }) {
 
   const dataMapping = {
     5: {
-      0: [126, 127, 128, 129],
-      1: [130, 131, 132, 133],
+      0: ["32/1/1", "32/1/2", "32/1/3", "32/1/4"],
+      1: ["32/1/11", "32/1/12", "32/1/13", "32/1/14"],
     },
     7: {
-      0: [
-     134,
-     135,
-     136,
-     137,
-      ],
-      1: [130, 131, 132, 133],
+      0: ["32/1/21", "32/1/22", "32/1/23", "32/1/24"],
+      1: ["32/1/31", "32/1/32", "32/1/33", "32/1/34"],
     },
   };
 
@@ -156,15 +151,17 @@ function Energy({ id }) {
 
   const updateChart = async () => {
     try {
-      const [r1, r2, r3] = await Promise.all([
+      const [r1, r2, r3, r4] = await Promise.all([
         getMeterData(dataMapping[floor][subView][0]),
         getMeterData(dataMapping[floor][subView][1]),
         getMeterData(dataMapping[floor][subView][2]),
+        getMeterData(dataMapping[floor][subView][3]),
       ]);
 
       setData(r1.current.data);
       setData2(r2.current.data);
       setData3(r3.current.data);
+      setData4(r4.current.data);
     } catch (e) {
       console.log(e);
     }

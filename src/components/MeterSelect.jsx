@@ -38,9 +38,28 @@ function MeterSelect() {
 
   return (
     <div
-      className="border-b border-transparent px-4 py-2 flex items-center justify-between text-lg relative transition-all cursor-pointer gap-4 w-fit hover:border-gray-300"
+      className="border-b border-transparent px-4 py-2 flex items-center justify-between text-lg relative transition-all cursor-pointer gap-4 min-w-fit w-72 hover:border-gray-300"
       onClick={() => setShowOptions(!showOptions)}
     >
+      {subView < 2 ? (
+        <svg width="25" height="25" viewBox="-6 -2 24 24">
+          <path
+            fill="currentColor"
+            d="M8.997 6.968H6.708V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v5.923a1 1 0 0 0 .966 1l1.937.061v7.404a.549.549 0 0 0 1.053.216l3.96-9.242a1 1 0 0 0-.92-1.394zM8.708 3v1.968h.289a3 3 0 0 1 2.757 4.181l-3.96 9.243a2.549 2.549 0 0 1-4.891-1.004v-5.466A3 3 0 0 1 0 8.923V3a3 3 0 0 1 3-3h2.708a3 3 0 0 1 3 3"
+          />
+        </svg>
+      ) : (
+        <svg width="25" height="25" viewBox="0 0 32 32">
+          <path
+            fill="currentColor"
+            d="M26 16a9.9 9.9 0 0 0-1.14-4.618l-1.495 1.496A7.95 7.95 0 0 1 24 16zm-2.586-6L22 8.586L17.285 13.3A3 3 0 0 0 16 13a3 3 0 1 0 3 3a3 3 0 0 0-.3-1.285zM16 17a1 1 0 1 1 1-1a1 1 0 0 1-1 1m0-9a8 8 0 0 1 3.122.635l1.496-1.496A9.986 9.986 0 0 0 6 16h2a8.01 8.01 0 0 1 8-8"
+          />
+          <path
+            fill="currentColor"
+            d="M16 30a14 14 0 1 1 14-14a14.016 14.016 0 0 1-14 14m0-26a12 12 0 1 0 12 12A12.014 12.014 0 0 0 16 4"
+          />
+        </svg>
+      )}
       {sectionsNames[subView]}
       <svg
         width="25"
@@ -56,10 +75,29 @@ function MeterSelect() {
             <div
               key={i}
               onClick={() => updateSubView(i)}
-              className={`hover:bg-yellow-100 transition-all py-2 cursor-pointer border-b px-4 ${
+              className={`hover:bg-yellow-100 transition-all py-2 cursor-pointer border-b px-4 flex items-center gap-4 ${
                 i == subView && "bg-yellow-300"
               }`}
             >
+              {i < 2 ? (
+                <svg width="25" height="25" viewBox="-6 -2 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M8.997 6.968H6.708V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v5.923a1 1 0 0 0 .966 1l1.937.061v7.404a.549.549 0 0 0 1.053.216l3.96-9.242a1 1 0 0 0-.92-1.394zM8.708 3v1.968h.289a3 3 0 0 1 2.757 4.181l-3.96 9.243a2.549 2.549 0 0 1-4.891-1.004v-5.466A3 3 0 0 1 0 8.923V3a3 3 0 0 1 3-3h2.708a3 3 0 0 1 3 3"
+                  />
+                </svg>
+              ) : (
+                <svg width="25" height="25" viewBox="0 0 32 32">
+                  <path
+                    fill="currentColor"
+                    d="M26 16a9.9 9.9 0 0 0-1.14-4.618l-1.495 1.496A7.95 7.95 0 0 1 24 16zm-2.586-6L22 8.586L17.285 13.3A3 3 0 0 0 16 13a3 3 0 1 0 3 3a3 3 0 0 0-.3-1.285zM16 17a1 1 0 1 1 1-1a1 1 0 0 1-1 1m0-9a8 8 0 0 1 3.122.635l1.496-1.496A9.986 9.986 0 0 0 6 16h2a8.01 8.01 0 0 1 8-8"
+                  />
+                  <path
+                    fill="currentColor"
+                    d="M16 30a14 14 0 1 1 14-14a14.016 14.016 0 0 1-14 14m0-26a12 12 0 1 0 12 12A12.014 12.014 0 0 0 16 4"
+                  />
+                </svg>
+              )}
               {n}
             </div>
           ))}
