@@ -337,7 +337,13 @@ function Header() {
             Configuración
           </button>
         </div>
-        <button className="p-2 flex items-center justify-center rounded bg-gray-100 logOut">
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.pathname = "/logout";
+          }}
+          className="p-2 flex items-center justify-center rounded bg-gray-100 logOut"
+        >
           <svg width="25" height="25" viewBox="0 0 24 24">
             <g fill="currentColor">
               <path

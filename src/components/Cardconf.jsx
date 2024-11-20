@@ -300,7 +300,7 @@ function Cardconf() {
             </p>
             <label
               onClick={() => toggleDB()}
-              className="flex cursor-pointer select-none items-center"
+              className="flex cursor-pointer select-none items-center infoLocal"
             >
               <div className="relative">
                 <div className="block h-8 w-14 rounded-full bg-gray-200"></div>
@@ -347,9 +347,9 @@ function Cardconf() {
                 </p>
               </div>
             </p>
-            <label
+            <abel
               onClick={() => toggleDB()}
-              className="flex cursor-pointer select-none items-center"
+              className="flex cursor-pointer select-none items-center infoNube"
             >
               <div className="relative">
                 <div className="block h-8 w-14 rounded-full bg-gray-200"></div>
@@ -359,7 +359,7 @@ function Cardconf() {
                   }`}
                 ></div>
               </div>
-            </label>
+            </abel>
           </div>
         </div>
       </div>

@@ -1,9 +1,40 @@
 import useData from "../store/dataState";
 import Floorselect from "../components/Floorselect";
 import MeterSelect from "../components/MeterSelect";
+import { writeFileXLSX, read, utils, writeFile } from "xlsx";
 
 function Headernav() {
   const { updateView, view } = useData();
+
+  const downloadData = async (t) => {
+    const today = new Date();
+    try {
+      const data = t.map((m) => ({
+        Time: "",
+        Value: "",
+      }));
+
+      const worksheet = utils.json_to_sheet(data);
+      const workbook = utils.book_new();
+      utils.book_append_sheet(
+        workbook,
+        worksheet,
+        `Gráficas ${today.getFullYear()}-${
+          today.getMonth() + 1
+        }-${today.getDate()}`
+      );
+
+      utils.sheet_add_aoa(worksheet, [["Fecha y Hora", "Valor"]], {
+        origin: "A1",
+      });
+
+      worksheet["!cols"] = [{ wch: 20 }, { wch: 30 }, { wch: 10 }, { wch: 15 }];
+
+      writeFile(workbook, "carrito.xlsx");
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const handleView = () => {
     view == 2 ? updateView(3) : updateView(2);
@@ -344,7 +375,13 @@ function Headernav() {
               Configuración
             </button>
           </div>
-          <button className="p-2 flex items-center justify-center rounded bg-gray-100 logOut">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.pathname = "/logout";
+            }}
+            className="p-2 flex items-center justify-center rounded bg-gray-100 logOut"
+          >
             <svg width="25" height="25" viewBox="0 0 24 24">
               <g fill="currentColor">
                 <path
