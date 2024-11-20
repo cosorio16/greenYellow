@@ -178,7 +178,8 @@ function Potency({ id }) {
             ? `0${selected[selected.length - 1]?.dia}`
             : selected[selected.length - 1]?.dia
         }T23:59:59Z`,
-        "Medidor"
+        "Medidor",
+        4
       );
 
       setData(voltajeData?.[0]);
@@ -198,7 +199,7 @@ function Potency({ id }) {
       numVarPhysics: 1,
       namesAxisY: ["Potencia Activa (KvA)"],
       positionAxisY: [0],
-      numDataByVarPhysics: [3],
+      numDataByVarPhysics: [4],
       data: [[data, data2, data3]],
       namesVar: [["L1", "L2", "L3", "Total"]],
       type: [0],

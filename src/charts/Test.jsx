@@ -175,7 +175,8 @@ function Test() {
             ? `0${selected[selected.length - 1]?.dia}`
             : selected[selected.length - 1]?.dia
         }T23:59:59Z`,
-        "Medidor"
+        "Medidor",
+        3
       );
 
       setData(voltajeData?.[0]);

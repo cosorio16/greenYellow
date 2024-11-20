@@ -176,7 +176,8 @@ function Presencie({ id }) {
             ? `0${selected[selected.length - 1]?.dia}`
             : selected[selected.length - 1]?.dia
         }T23:59:59Z`,
-        "Sensor"
+        "Sensor",
+        1
       );
 
       setData(voltajeData?.[0]);
