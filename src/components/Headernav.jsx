@@ -362,7 +362,7 @@ function Headernav() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => updateView(0)}
-            className="w-10 h-10 aspect-auto bg-gray-600 text-white flex items-center justify-center rounded-full hover:scale-105 transition-all active:scale-95"
+            className="min-w-10 min-h-10 bg-gray-600 text-white flex items-center justify-center rounded-full hover:scale-105 transition-all active:scale-95 aspect-square"
           >
             <svg width="25" height="25" viewBox="0 0 24 24">
               <path

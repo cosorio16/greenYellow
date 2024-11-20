@@ -155,7 +155,7 @@ function Meterview() {
                       type="number"
                       name=""
                       id=""
-                      placeholder={`${timeInput}seg`}
+                      placeholder={`${timeInput} seg`}
                       onChange={(e) => setTimeInput(e.target.value)}
                       className="py-2 px-4 w-full border rounded"
                     />

@@ -17,7 +17,7 @@ function Floorselect() {
 
   return (
     <div
-      className="px-4 py-2 flex items-center justify-between text-lg relative gap-4 cursor-pointer hover:border-b transition-all border-b border-transparent hover:border-gray-300"
+      className="px-4 py-2 flex items-center justify-between text-lg relative gap-4 cursor-pointer hover:border-b transition-all border-b border-transparent hover:border-gray-300 min-w-fit w-44"
       onClick={() => setShowOptions(!showOptions)}
     >
       <svg width="25" height="25" viewBox="0 0 24 24">
