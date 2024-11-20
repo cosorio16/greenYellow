@@ -128,7 +128,7 @@ const Calendar = forwardRef((props, ref) => {
       </div>
 
       {showDays && (
-        <div className="w-[270px]  absolute top-full left-0 bg-white border rounded flex items-center gap-4 justify-center flex-col px-4 py-2">
+        <div className="w-[280px]  absolute top-full left-0 bg-white border rounded flex items-center gap-4 justify-center flex-col px-4 py-2">
           <div className="flex items-center gap-2 justify-between w-full">
             <button onClick={handleBackMonth}>{"<"}</button>
             <h1>
@@ -139,7 +139,7 @@ const Calendar = forwardRef((props, ref) => {
 
           <div className="grid grid-cols-7 m-auto justify-items-center  border">
             {week.map((w, i) => (
-              <p key={i} className=" w-full text-center border-b ">
+              <p key={i} className=" w-full text-center border-b p-2">
                 {w}
               </p>
             ))}
@@ -151,7 +151,7 @@ const Calendar = forwardRef((props, ref) => {
                 onMouseUp={handleMouseUp}
                 className={`${
                   handleIsSelected(d) && "bg-yellow-300"
-                } aspect-square rounded-full flex items-center justify-center w-5 h-5 m-1 p-4 hover:bg-yellow-200 cursor-pointer`}
+                } aspect-square rounded-full flex items-center justify-center w-5 h-5 m-1 px-4 py-4 hover:bg-yellow-200 cursor-pointer`}
               >
                 {d.dia}
               </p>
