@@ -43,7 +43,6 @@ header .hbutton:hover:after {
   width: 110%;
   background: #fbd015;
   height: 5px;
-
   opacity: 1;
 }
 
@@ -51,14 +50,21 @@ header .hbutton.logOut::after {
   background: none;
 }
 
-.infocardLocal, .infocardNube {
+.infocardLocal,
+.infocardNube {
   opacity: 0;
-  transition: all .123s ease-in-out;
+  visibility: hidden;
+  z-index: -1;
+  transition: all 0.123s ease-in-out;
 }
 
-.infoLocal:hover  + .infocardLocal {
+.infoLocal:hover + .infocardLocal {
   opacity: 1;
+  visibility: visible;
+  z-index: 9999;
 }
-.infoNube:hover  + .infocardNube {
+.infoNube:hover + .infocardNube {
   opacity: 1;
+  visibility: visible;
+  z-index: 9999;
 }

@@ -150,15 +150,17 @@ function EnergyConsumed({ id }) {
 
   const updateChart = async () => {
     try {
-      const [r1, r2, r3] = await Promise.all([
+      const [r1, r2, r3, r4] = await Promise.all([
         getMeterData(dataMapping[floor][subView][0]),
         getMeterData(dataMapping[floor][subView][1]),
         getMeterData(dataMapping[floor][subView][2]),
+        getMeterData(dataMapping[floor][subView][3]),
       ]);
 
       setData(r1.current.data);
       setData2(r2.current.data);
       setData3(r3.current.data);
+      setData4(r4.current.data);
     } catch (e) {
       console.log(e);
     }
