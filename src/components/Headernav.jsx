@@ -1,7 +1,7 @@
 import useData from "../store/dataState";
 import Floorselect from "../components/Floorselect";
 import MeterSelect from "../components/MeterSelect";
-import { utils, writeFile } from "xlsx";
+import ExcelJS from "exceljs";
 import { clearDataFile, data } from "../utils/DataExcel";
 import { useEffect } from "react";
 
@@ -23,23 +23,26 @@ function Headernav() {
 
       for (const [key, valueArrays] of Object.entries(data)) {
         if (valueArrays && Array.isArray(valueArrays[0])) {
+          // Procesamos cada subarray dentro del tema
           valueArrays[0].forEach((subArray) => {
             if (Array.isArray(subArray)) {
               subArray.forEach(({ x, y }) => {
                 allEntries.push({
                   Fecha: x,
                   Tema: key,
-                  Valor: typeof y === "number" ? y.toFixed(2) : y,
+                  Valor: typeof y === "number" ? y.toFixed(2) : y, // Ajustamos si es decimal
                 });
-                headers.add(key);
+                headers.add(key); // Añadimos el tema a los encabezados
               });
             }
           });
         }
       }
+
       allEntries.sort((a, b) => a.Fecha - b.Fecha);
 
       const uniqueDates = [...new Set(allEntries.map((entry) => entry.Fecha))];
+
       const excelData = uniqueDates.map((date) => {
         const row = { Fecha: new Date(date).toLocaleString() };
 
@@ -53,23 +56,49 @@ function Headernav() {
         return row;
       });
 
-      const worksheet = utils.json_to_sheet(excelData);
-      utils.sheet_add_aoa(worksheet, [["Fecha", ...headers]], { origin: "A1" });
-      worksheet["!cols"] = [
-        { wch: 20 },
-        ...Array.from(headers).map(() => ({ wch: 15 })),
-      ];
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Datos Unificados");
 
-      const workbook = utils.book_new();
-      utils.book_append_sheet(workbook, worksheet, "Datos Unificados");
+      worksheet.addRow(["Fecha", ...Array.from(headers)]);
+
+      excelData.forEach((rowData) => {
+        const row = [
+          rowData.Fecha,
+          ...Array.from(headers).map((header) => rowData[header] || ""),
+        ];
+        worksheet.addRow(row);
+      });
+
+      worksheet.columns.forEach((column) => {
+        let maxLength = 0;
+        column.eachCell((cell) => {
+          if (cell.value) {
+            maxLength = Math.max(maxLength, cell.value.toString().length);
+          }
+        });
+        column.width = maxLength < 10 ? 10 : maxLength;
+      });
+
+      worksheet.autoFilter =
+        "A1:" + String.fromCharCode(64 + worksheet.columns.length) + "1";
 
       const today = new Date();
       const fileName = `Datos_Unificados_${today.getFullYear()}-${
         today.getMonth() + 1
       }-${today.getDate()}.xlsx`;
-      writeFile(workbook, fileName);
+
+      await workbook.xlsx.writeBuffer().then((buffer) => {
+        const blob = new Blob([buffer], { type: "application/octet-stream" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+      });
     } catch (error) {
-      console.error("Error al generar el archivo unificado:", error);
+      console.error(
+        "Error al generar el archivo unificado con ExcelJS:",
+        error
+      );
     }
   };
 
@@ -456,7 +485,7 @@ function Headernav() {
             Vista de {view == 2 && "Gráficas"}
             {view == 3 && "Datos"}
           </button>
-          {subView == 3 && (
+          {view == 3 && (
             <button
               onClick={() => downloadUnifiedExcel(data)}
               className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all"
