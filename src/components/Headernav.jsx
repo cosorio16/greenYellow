@@ -1,43 +1,76 @@
 import useData from "../store/dataState";
 import Floorselect from "../components/Floorselect";
 import MeterSelect from "../components/MeterSelect";
-import { writeFileXLSX, read, utils, writeFile } from "xlsx";
+import { utils, writeFile } from "xlsx";
+import { clearDataFile, data } from "../utils/DataExcel";
+import { useEffect } from "react";
 
 function Headernav() {
-  const { updateView, view } = useData();
-
-  const downloadData = async (t) => {
-    const today = new Date();
-    try {
-      const data = t.map((m) => ({
-        Time: "",
-        Value: "",
-      }));
-
-      const worksheet = utils.json_to_sheet(data);
-      const workbook = utils.book_new();
-      utils.book_append_sheet(
-        workbook,
-        worksheet,
-        `Gráficas ${today.getFullYear()}-${
-          today.getMonth() + 1
-        }-${today.getDate()}`
-      );
-
-      utils.sheet_add_aoa(worksheet, [["Fecha y Hora", "Valor"]], {
-        origin: "A1",
-      });
-
-      worksheet["!cols"] = [{ wch: 20 }, { wch: 30 }, { wch: 10 }, { wch: 15 }];
-
-      writeFile(workbook, "carrito.xlsx");
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const { updateView, view, subView, floor } = useData();
 
   const handleView = () => {
     view == 2 ? updateView(3) : updateView(2);
+  };
+
+  useEffect(() => {
+    clearDataFile();
+  }, [floor, subView]);
+
+  const downloadUnifiedExcel = async (data) => {
+    try {
+      const allEntries = [];
+      const headers = new Set();
+
+      for (const [key, valueArrays] of Object.entries(data)) {
+        if (valueArrays && Array.isArray(valueArrays[0])) {
+          valueArrays[0].forEach((subArray) => {
+            if (Array.isArray(subArray)) {
+              subArray.forEach(({ x, y }) => {
+                allEntries.push({
+                  Fecha: x,
+                  Tema: key,
+                  Valor: typeof y === "number" ? y.toFixed(2) : y,
+                });
+                headers.add(key);
+              });
+            }
+          });
+        }
+      }
+      allEntries.sort((a, b) => a.Fecha - b.Fecha);
+
+      const uniqueDates = [...new Set(allEntries.map((entry) => entry.Fecha))];
+      const excelData = uniqueDates.map((date) => {
+        const row = { Fecha: new Date(date).toLocaleString() };
+
+        headers.forEach((header) => {
+          const matchingEntry = allEntries.find(
+            (entry) => entry.Fecha === date && entry.Tema === header
+          );
+          row[header] = matchingEntry ? matchingEntry.Valor : "";
+        });
+
+        return row;
+      });
+
+      const worksheet = utils.json_to_sheet(excelData);
+      utils.sheet_add_aoa(worksheet, [["Fecha", ...headers]], { origin: "A1" });
+      worksheet["!cols"] = [
+        { wch: 20 },
+        ...Array.from(headers).map(() => ({ wch: 15 })),
+      ];
+
+      const workbook = utils.book_new();
+      utils.book_append_sheet(workbook, worksheet, "Datos Unificados");
+
+      const today = new Date();
+      const fileName = `Datos_Unificados_${today.getFullYear()}-${
+        today.getMonth() + 1
+      }-${today.getDate()}.xlsx`;
+      writeFile(workbook, fileName);
+    } catch (error) {
+      console.error("Error al generar el archivo unificado:", error);
+    }
   };
 
   return (
@@ -423,9 +456,14 @@ function Headernav() {
             Vista de {view == 2 && "Gráficas"}
             {view == 3 && "Datos"}
           </button>
-          {/* <button className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all">
-            Descargar Datos
-          </button> */}
+          {subView == 3 && (
+            <button
+              onClick={() => downloadUnifiedExcel(data)}
+              className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all"
+            >
+              Descargar Datos
+            </button>
+          )}
         </div>
       </div>
     </header>
