@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import useData from "../store/dataState";
+import { addTitle } from "../utils/DataExcel";
 
 function MeterSelect() {
   const { floor, updateSubView, subView } = useData();
@@ -35,6 +36,10 @@ function MeterSelect() {
       });
     };
   }, [sections]);
+
+  useEffect(() => {
+    addTitle(sectionsNames[subView]);
+  }, [subView]);
 
   return (
     <div

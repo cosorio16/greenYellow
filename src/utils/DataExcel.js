@@ -1,11 +1,16 @@
-let data = {}
+let data = {};
+let titleFile = "";
 
 function addDataFiles(dataGraphic, nameData) {
-  data[`"${nameData}"`] = dataGraphic
+  data[`"${nameData}"`] = dataGraphic;
 }
 
-function clearDataFile () {
-  data = {}
+function addTitle(title) {
+  titleFile = title;
 }
 
-export { addDataFiles, clearDataFile, data }
+function clearDataFile() {
+  data = {};
+}
+
+export { addDataFiles, clearDataFile, data, titleFile, addTitle };

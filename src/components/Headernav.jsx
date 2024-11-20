@@ -2,7 +2,7 @@ import useData from "../store/dataState";
 import Floorselect from "../components/Floorselect";
 import MeterSelect from "../components/MeterSelect";
 import ExcelJS from "exceljs";
-import { clearDataFile, data } from "../utils/DataExcel";
+import { clearDataFile, data, titleFile } from "../utils/DataExcel";
 import { useEffect } from "react";
 
 function Headernav() {
@@ -23,16 +23,19 @@ function Headernav() {
 
       for (const [key, valueArrays] of Object.entries(data)) {
         if (valueArrays && Array.isArray(valueArrays[0])) {
-          // Procesamos cada subarray dentro del tema
-          valueArrays[0].forEach((subArray) => {
+          valueArrays[0].forEach((subArray, index) => {
             if (Array.isArray(subArray)) {
+              const columnName =
+                valueArrays[0].length === 4 && index === 3
+                  ? `${key} Total`
+                  : `${key} ${index + 1}`;
               subArray.forEach(({ x, y }) => {
                 allEntries.push({
                   Fecha: x,
-                  Tema: key,
-                  Valor: typeof y === "number" ? y.toFixed(2) : y, // Ajustamos si es decimal
+                  Tema: columnName,
+                  Valor: typeof y === "number" ? y.toFixed(2) : y,
                 });
-                headers.add(key); // Añadimos el tema a los encabezados
+                headers.add(columnName);
               });
             }
           });
@@ -42,10 +45,8 @@ function Headernav() {
       allEntries.sort((a, b) => a.Fecha - b.Fecha);
 
       const uniqueDates = [...new Set(allEntries.map((entry) => entry.Fecha))];
-
       const excelData = uniqueDates.map((date) => {
         const row = { Fecha: new Date(date).toLocaleString() };
-
         headers.forEach((header) => {
           const matchingEntry = allEntries.find(
             (entry) => entry.Fecha === date && entry.Tema === header
@@ -83,7 +84,7 @@ function Headernav() {
         "A1:" + String.fromCharCode(64 + worksheet.columns.length) + "1";
 
       const today = new Date();
-      const fileName = `Datos_Unificados_${today.getFullYear()}-${
+      const fileName = `DatosUnificados-${today.getFullYear()}-${
         today.getMonth() + 1
       }-${today.getDate()}.xlsx`;
 
@@ -101,7 +102,6 @@ function Headernav() {
       );
     }
   };
-
   return (
     <header className="w-full min-h-fit flex flex-col gap-8font-semibold shadow-md z-40 fixed bg-white top-0 left-0">
       <div className="flex justify-between items-center border-b px-8 h-16 font-semibold">
