@@ -3,7 +3,7 @@ import Configuration from "./views/Configuration";
 import Meterview from "./views/Meterview";
 import Chartview from "./views/Chartview";
 import useData from "./store/dataState";
-
+     
 function App() {
   const { view } = useData();
 
