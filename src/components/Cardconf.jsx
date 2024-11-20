@@ -265,9 +265,9 @@ function Cardconf() {
         <p className="text-2xl">Configuración de gráficas</p>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-8">
-            <p className="min-w-fit w-56  rounded py-2 font-medium flex items-center gap-4">
+            <p className="min-w-fit w-56  rounded py-2 font-medium flex items-center gap-4 relative">
               <svg
-                className="text-yellow-300"
+                className="text-yellow-300 infoLocal cursor-pointer"
                 width="25"
                 height="25"
                 viewBox="0 0 24 24"
@@ -284,6 +284,19 @@ function Cardconf() {
                 </g>
               </svg>
               Ver Datos Locales
+              <div className="absolute bg-white shadow border w-[400px] z-50 bottom-full px-6 py-3 infocardLocal">
+                <p className="text-sm">
+                  Esta opción utiliza una base de datos local almacenada en el
+                  dispositivo, donde se guarda la información generada por los
+                  sensores con una resolución predeterminada. A partir de estos
+                  datos, se generan parámetros adicionales mediante análisis. No
+                  requiere conexión a internet, lo que permite acceder a la
+                  información de manera independiente a la red. Sin embargo, se
+                  recomienda moderación al solicitar periodos de tiempo extensos
+                  para evitar saturar el sistema. En caso de inconvenientes,
+                  contacta a tu técnico para obtener soporte.
+                </p>
+              </div>
             </p>
             <label
               onClick={() => toggleDB()}
@@ -300,9 +313,9 @@ function Cardconf() {
             </label>
           </div>
           <div className="flex items-center gap-8">
-            <p className="min-w-fit w-56 flex items-center gap-4 font-medium">
+            <p className="min-w-fit w-56 flex items-center gap-4 font-medium relative">
               <svg
-                className="text-yellow-300"
+                className="text-yellow-300 cursor-pointer infoNube"
                 width="25"
                 height="25"
                 viewBox="0 0 24 24"
@@ -319,6 +332,20 @@ function Cardconf() {
                 </g>
               </svg>
               Ver Datos De Nube
+              <div className="absolute bg-white shadow border w-[400px] bottom-full px-6 py-3 infocardNube z-50">
+                <p className="text-sm">
+                  Esta función utiliza InfluxDB para proporcionar acceso a datos
+                  precisos generados por los sensores en momentos específicos,
+                  siendo ideal para monitorear cambios en tiempo real o
+                  consultar datos históricos. Requiere una conexión estable a
+                  internet para acceder a la base de datos, y es importante
+                  evitar solicitar demasiados días de información para prevenir
+                  la sobrecarga del sistema. Puedes activar o desactivar esta
+                  opción según tus necesidades directamente desde la
+                  configuración. Si encuentras algún problema, no dudes en
+                  comunicarte con tu técnico para recibir asistencia.
+                </p>
+              </div>
             </p>
             <label
               onClick={() => toggleDB()}

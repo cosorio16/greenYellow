@@ -386,9 +386,9 @@ function Headernav() {
             Vista de {view == 2 && "Gráficas"}
             {view == 3 && "Datos"}
           </button>
-          <button className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all">
+          {/* <button className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all">
             Descargar Datos
-          </button>
+          </button> */}
         </div>
       </div>
     </header>
