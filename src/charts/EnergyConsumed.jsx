@@ -182,7 +182,7 @@ function EnergyConsumed({ id }) {
             : selected[selected.length - 1]?.dia
         }T23:59:59Z`,
         "Medidor",
-        3
+        4
       );
 
       setData(voltajeData?.[0]);
