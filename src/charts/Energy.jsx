@@ -3,7 +3,7 @@ import Calendar from "../components/Calendar";
 import useData from "../store/dataState";
 import trends from "../data/trends";
 import chartGenerator from "../utils/chartGenerator";
-import { getDataDB } from "../utils/influxDB";
+import { getDataDB, totalAccumulatedEnergy } from "../utils/influxDB";
 import { Chart } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
 
@@ -169,7 +169,7 @@ function Energy({ id }) {
 
   const fetchDataDB = async () => {
     try {
-      const voltajeData = await getDataDB(
+      const voltajeData = await totalAccumulatedEnergy(
         "Energia Activa",
         `${id}`,
         `${selected[0]?.year}-${selected[0]?.mes + 1}-${

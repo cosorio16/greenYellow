@@ -32,7 +32,7 @@ function chartGenerator(dataGraphic, fechaStart, DB) {
         // Caso: Datos provenientes de base de datos
         const dataEntries = dataGraphic.data[index]?.[idx] || [];
         dataVars[index][idx] = dataEntries.map((e) => ({
-          x: new Date(e.x).getTime() + 18000000,
+          x: new Date(e.x).getTime(),
           y: e.y,
         }));
       } else {

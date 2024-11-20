@@ -9,52 +9,67 @@
 // "Lumenes",
 // "Presencia"
 
-async function getDataDB(nameData, numberdata, timeMin, timeMax, type) {
-  let queryDB = ''
-  let totalToAddResult = [];
-  let result = [];
+function calculateGroupTime(days) {
+  if (days <= 1) return 2;
+  if (days <= 3) return 5;
+  if (days <= 5) return 10;
+  if (days <= 8) return 15;
+  if (days <= 11) return 20;
+  if (days <= 21) return 30;
+  if (days <= 30) return 60;
+  if (days > 30) return days*2
+}
 
-  if(type == 'Medidor' && nameData != 'Energia Activa'){ // -----------Cosulta a medidor
-    queryDB = `SELECT "${nameData}"
-    FROM edificio WHERE "nombre"='${type} ${numberdata}' AND time > '${timeMin}' AND time < '${timeMax}' GROUP BY "circuito" tz('America/Bogota')`
-  } else if (type == 'Medidor' && nameData == 'Energia Activa') {
-  queryDB = `SELECT LAST("${nameData}") AS "Energia Activa" 
-  FROM edificio WHERE "nombre"='Medidor ${numberdata}' AND time >= '${timeMin}' AND time < '${timeMax}' GROUP BY time(1h), "circuito"`
-  } else if (type == 'Sensor') { // ------------------Cosulta a sensores
-    queryDB = `SELECT "${nameData}"
-    FROM edificio WHERE "nombre"='${type} ${numberdata}' AND time > '${timeMin}' AND time < '${timeMax}' tz('America/Bogota')`
+async function getDataDB(nameData, numberdata, timeMin, timeMax, type, numberTopic) {
+  let queryDB = ''
+  let result = [];
+  let days = (new Date(timeMax).getTime() - new Date(timeMin).getTime()) / 86400000
+  let timeGroup = Math.round(calculateGroupTime(days))
+
+  if(days <= 0.5) {
+    if (type == 'Sensor'){
+      for (let i=0; i<numberTopic; i++) {
+        queryDB += `SELECT "${nameData}" AS "last" FROM "autogen"."edificio" WHERE ("nombre"::tag = '${type} ${numberdata}') AND time >= '${timeMin}' + 5h and time <= '${timeMax}' + 5h fill(null) tz('America/Bogota');`
+      }
+    } else if (type == 'Medidor') {
+      for (let i=0; i<numberTopic; i++) {
+        let typeVar = i==3 ? "Total" : i+1;
+        queryDB += `SELECT "${nameData}" AS "last" FROM "autogen"."edificio" WHERE ("circuito"::tag = '${typeVar}' AND "nombre"::tag = '${type} ${numberdata}') AND time >= '${timeMin}' + 5h and time <= '${timeMax}' + 5h fill(null) tz('America/Bogota');`
+      }
+    }
+  } else {
+    if(type == 'Sensor') {
+      for (let i=0; i<numberTopic; i++) {
+        queryDB += `SELECT last("${nameData}") FROM "autogen"."edificio" WHERE ("nombre"::tag = '${type} ${numberdata}') AND time >= '${timeMin}' + 5h and time <= '${timeMax}' + 5h GROUP BY time(${timeGroup}m) fill(null) tz('America/Bogota');`
+      }
+    }else if (type == 'Medidor') {
+      for (let i=0; i<numberTopic; i++) {
+        let typeVar = i==3 ? "Total" : i+1;
+        queryDB += `SELECT last("${nameData}") FROM "autogen"."edificio" WHERE ("circuito"::tag = '${typeVar}' AND "nombre"::tag = '${type} ${numberdata}') AND time >= '${timeMin}' + 5h and time <= '${timeMax}' + 5h GROUP BY time(${timeGroup}m) fill(null) tz('America/Bogota');`
+      }
+    }
   }
 
-  const response = fetch('http://74.208.139.232:1880/greenyellow', {
-      method: 'POST',
-      headers: {'Content-Type': 'text/plain'},
-      body: queryDB
-    }
-  )
+  let response = await fetch( "http://74.208.139.232:1880/greenyellow", {
+  method: 'POST',
+  headers: {'Content-Type': 'text/plain'},
+  body: queryDB,
+  })
   .then(r => r.json())
   .then(res => {
-    if(type == 'Medidor') {
-      res.map(e => {
-        if(e.circuito != "Total") {
-          result[e.circuito-1] = !result[e.circuito-1] ? [] : result[e.circuito-1]
-          result[e.circuito-1].push({x:e.time,y:e[`${nameData}`] || 0})
-        } else if (e.circuito == "Total") {
-          totalToAddResult.push({x:e.time,y:e[`${nameData}`]})
-        }
-      })
-      if (res[0]) result[result.length] = totalToAddResult
-      else result = []
-    } else if (type == 'Sensor'){
-      res.forEach((e) => {
-        result[0] = !result[0] ? [] : result[0]
-        result[0].push({x:e.time, y:e[`${nameData}`] || 0})
-      })
+    if(type == 'Sensor') {
+      result = numberTopic <= 1 
+        ? [res.map(elm => ({ x: new Date(elm.time).getTime(), y: elm.last }))]
+        : res.map(elm => elm.map(e => ({ x: new Date(e.time).getTime(), y: e.last })));
+    }else if (type == 'Medidor') {
+      result = numberTopic <= 1 
+        ? [res.map(elm => ({ x: new Date(elm.time).getTime(), y: elm.last }))]
+        : res.map(elm => elm.map(e => ({ x: new Date(e.time).getTime(), y: e.last })));
     }
-    if(res[0]) return result
-    else return []
+    return result
   })
   .catch(error => console.error('Error:', error))
-  return response
+  return response 
 }
 
 async function totalAccumulatedEnergy(nameData, numberdata, timeMin, timeMax) {
@@ -62,7 +77,7 @@ async function totalAccumulatedEnergy(nameData, numberdata, timeMin, timeMax) {
   let result = [];
   let totalToAddResult = [];
 
-  queryDB = `SELECT LAST("${nameData}") - FIRST("${nameData}") AS "consumo" FROM edificio WHERE "nombre"='Medidor ${numberdata}' AND time >= '${timeMin}' AND time < '${timeMax}' GROUP BY time(24h), "circuito"`
+  queryDB =`SELECT LAST("${nameData}") - FIRST("${nameData}") AS "consumo" FROM edificio WHERE "nombre"='Medidor ${numberdata}' AND time >= '${timeMin}' + 5h AND time < '${timeMax}' + 5h GROUP BY time(24h), "circuito" tz('America/Bogota')`
 
   let response = await fetch( "http://74.208.139.232:1880/greenyellow", {
   method: 'POST',
@@ -87,5 +102,7 @@ async function totalAccumulatedEnergy(nameData, numberdata, timeMin, timeMax) {
 
   return response
 }
+
+
 
 export { getDataDB, totalAccumulatedEnergy }
