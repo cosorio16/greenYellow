@@ -62,6 +62,7 @@ function Factor({ id }) {
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
+  const [data4, setData4] = useState([]);
 
   const [selected, setSelected] = useState([
     {
@@ -185,6 +186,7 @@ function Factor({ id }) {
       setData(voltajeData?.[0]);
       setData2(voltajeData?.[1]);
       setData3(voltajeData?.[2]);
+      setData4(voltajeData?.[3]);
     } catch (e) {
       console.log(e);
     }
@@ -200,7 +202,7 @@ function Factor({ id }) {
       namesAxisY: ["Factor de Potencia"],
       positionAxisY: [0],
       numDataByVarPhysics: [4],
-      data: [[data, data2, data3]],
+      data: [[data, data2, data3, data4]],
       namesVar: [["L1", "L2", "L3", "Total"]],
       type: [0],
       minRangeAxisX: 5,
