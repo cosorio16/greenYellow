@@ -1,3 +1,5 @@
+import { addDataFiles } from "./DataExcel";
+
 function chartGenerator(dataGraphic, fechaStart, DB) {
   if (!dataGraphic || !fechaStart) {
     throw new Error("Parámetros inválidos: 'dataGraphic' o 'fechaStart' están ausentes.");
@@ -51,6 +53,8 @@ function chartGenerator(dataGraphic, fechaStart, DB) {
       }
     }
   }
+
+  addDataFiles(dataVars, dataGraphic.title)
 
   // Ordenar y unir timestamps
   for (let index = 0; index < numVarPhysics; index++) {

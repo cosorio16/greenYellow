@@ -3,7 +3,7 @@ import Calendar from "../components/Calendar";
 import useData from "../store/dataState";
 import trends from "../data/trends";
 import chartGenerator from "../utils/chartGenerator";
-import { getDataDB, totalAccumulatedEnergy } from "../utils/influxDB";
+import { totalAccumulatedEnergy } from "../utils/influxDB";
 import { Chart } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
 
@@ -24,6 +24,7 @@ import {
   Decimation,
   scales,
 } from "chart.js";
+
 
 ChartJS.register(
   LinearScale,
