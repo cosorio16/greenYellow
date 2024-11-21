@@ -39,7 +39,7 @@ function MeterSelect() {
 
   useEffect(() => {
     addTitle(sectionsNames[subView]);
-  }, [subView]);
+  }, [subView, sections, floor, sectionsNames]);
 
   return (
     <div

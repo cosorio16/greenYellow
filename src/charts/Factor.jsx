@@ -50,12 +50,12 @@ function Factor({ id }) {
 
   const dataMapping = {
     5: {
-      0: ["1/0/181", "1/0/191", "1/0/201"],
-      1: ["1/0/182", "1/0/192", "1/0/202"],
+      0: ["1/0/181", "1/0/191", "1/0/201", "1/0/211"],
+      1: ["1/0/182", "1/0/192", "1/0/202", "1/0/212"],
     },
     7: {
-      0: ["1/0/183", "1/0/193", "1/0/203"],
-      1: ["1/0/184", "1/0/194", "1/0/204"],
+      0: ["1/0/183", "1/0/193", "1/0/203", "1/0/213"],
+      1: ["1/0/184", "1/0/194", "1/0/204", "1/0/214"],
     },
   };
 
@@ -150,15 +150,17 @@ function Factor({ id }) {
 
   const updateChart = async () => {
     try {
-      const [r1, r2, r3] = await Promise.all([
+      const [r1, r2, r3, r4] = await Promise.all([
         getMeterData(dataMapping[floor][subView][0]),
         getMeterData(dataMapping[floor][subView][1]),
         getMeterData(dataMapping[floor][subView][2]),
+        getMeterData(dataMapping[floor][subView][3]),
       ]);
 
       setData(r1.current.data);
       setData2(r2.current.data);
       setData3(r3.current.data);
+      setData4(r4.current.data);
     } catch (e) {
       console.log(e);
     }

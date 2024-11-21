@@ -50,12 +50,12 @@ function Potency({ id }) {
 
   const dataMapping = {
     5: {
-      0: ["1/0/61", "1/0/71", "1/0/81"],
-      1: ["1/0/62", "1/0/72", "1/0/82"],
+      0: ["1/0/61", "1/0/71", "1/0/81", "1/0/171"],
+      1: ["1/0/62", "1/0/72", "1/0/82", "1/0/172"],
     },
     7: {
-      0: ["1/0/63", "1/0/73", "1/0/83"],
-      1: ["1/0/64", "1/0/74", "1/0/84"],
+      0: ["1/0/63", "1/0/73", "1/0/83", "1/0/173"],
+      1: ["1/0/64", "1/0/74", "1/0/84", "1/0/174"],
     },
   };
 
@@ -150,15 +150,17 @@ function Potency({ id }) {
 
   const updateChart = async () => {
     try {
-      const [r1, r2, r3] = await Promise.all([
+      const [r1, r2, r3, r4] = await Promise.all([
         getMeterData(dataMapping[floor][subView][0]),
         getMeterData(dataMapping[floor][subView][1]),
         getMeterData(dataMapping[floor][subView][2]),
+        getMeterData(dataMapping[floor][subView][3]),
       ]);
 
       setData(r1.current.data);
       setData2(r2.current.data);
       setData3(r3.current.data);
+      setData4(r4.current.data);
     } catch (e) {
       console.log(e);
     }

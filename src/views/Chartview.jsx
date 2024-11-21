@@ -12,8 +12,6 @@ import ComOrg from "../charts/ComOrg";
 import CO2 from "../charts/CO2";
 import useData from "../store/dataState";
 import Lums from "../charts/Lumenes";
-import { data } from "../utils/DataExcel";
-import ExcelJS from "exceljs";
 
 function Chartview() {
   const { subView, floor } = useData();
@@ -37,106 +35,9 @@ function Chartview() {
     },
   };
 
-  const downloadMultipleSheetsExcel = async (data) => {
-    try {
-      const workbook = new ExcelJS.Workbook();
-  
-      // Recorrer los datos y estructurarlos por tema
-      for (const [key, valueArrays] of Object.entries(data)) {
-        if (valueArrays && Array.isArray(valueArrays[0])) {
-          const worksheet = workbook.addWorksheet(key); // Crear una hoja para cada tema
-  
-          // Crear los encabezados de las columnas
-          const headers = ["Fecha", "Valor"];
-          const headerRow = worksheet.addRow(headers);
-  
-          // Estilo de los encabezados
-          headerRow.eachCell((cell) => {
-            cell.font = { bold: true, color: { argb: "FFFFFF" } };
-            cell.fill = {
-              type: "pattern",
-              pattern: "solid",
-              fgColor: { argb: "F9E79F" }, // Amarillo suave
-            };
-            cell.alignment = { horizontal: "center" };
-            cell.border = {
-              top: { style: "thin", color: { argb: "D9D9D9" } },
-              left: { style: "thin", color: { argb: "D9D9D9" } },
-              bottom: { style: "thin", color: { argb: "D9D9D9" } },
-              right: { style: "thin", color: { argb: "D9D9D9" } },
-            };
-          });
-  
-          // Procesar cada subArray dentro de cada tema
-          valueArrays[0].forEach((subArray, index) => {
-            if (Array.isArray(subArray)) {
-              const columnName =
-                valueArrays[0].length === 4 && index === 3
-                  ? `${key} Total`
-                  : `${key} ${index + 1}`;
-  
-              subArray.forEach(({ x, y }) => {
-                const formattedDate = new Date(x).toLocaleString();
-                const value = typeof y === "number" ? y.toFixed(2) : y;
-                worksheet.addRow([formattedDate, value]);
-              });
-            }
-          });
-  
-          // Estilizar las filas alternando colores (amarillos suaves)
-          worksheet.eachRow((row, rowNumber) => {
-            const bgColor = rowNumber % 2 === 0 ? "FFF9E0" : "FDF5E6"; // Amarillos suaves alternados
-            row.eachCell((cell) => {
-              cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: bgColor },
-              };
-              cell.border = {
-                top: { style: "thin", color: { argb: "D9D9D9" } },
-                left: { style: "thin", color: { argb: "D9D9D9" } },
-                bottom: { style: "thin", color: { argb: "D9D9D9" } },
-                right: { style: "thin", color: { argb: "D9D9D9" } },
-              };
-            });
-          });
-  
-          // Ajustar el ancho de las columnas
-          worksheet.columns.forEach((column) => {
-            column.width = 20;
-          });
-  
-          // Agregar el filtro a las columnas
-          worksheet.autoFilter = {
-            from: { row: 1, column: 1 },
-            to: { row: 1, column: 2 },
-          };
-        }
-      }
-  
-      // Guardar el archivo
-      const today = new Date();
-      const fileName = `DatosTemas-${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}.xlsx`;
-  
-      await workbook.xlsx.writeBuffer().then((buffer) => {
-        const blob = new Blob([buffer], { type: "application/octet-stream" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        link.click();
-      });
-    } catch (error) {
-      console.error("Error al generar el archivo con hojas por tema con ExcelJS:", error);
-    }
-  };
-  
-  
-  
-  
   return (
     <div className="w-full min-h-screen flex flex-col">
-      {/* <Headernav></Headernav> */}
-      <button onClick={() => downloadMultipleSheetsExcel(data)}>Carlos</button>
+      <Headernav></Headernav>
       <main className="flex flex-col bg-gray-100 grow pt-40 p-5">
         <div className="flex flex-col gap-4 w-full">
           <div className="flex justify-between items-center w-full"></div>
@@ -147,9 +48,7 @@ function Chartview() {
                   <Energy id={datamapping[floor][subView]}></Energy>
                 </div>
                 <div className="aspect-auto max-w-[1200px] w-full border p-4">
-                  <EnergyConsumed
-                    id={datamapping[floor][subView]}
-                  ></EnergyConsumed>
+                  <Potency id={datamapping[floor][subView]}></Potency>
                 </div>
                 <div className="aspect-auto max-w-[1200px] w-full border p-4">
                   <Voltajes id={datamapping[floor][subView]}></Voltajes>
@@ -158,10 +57,12 @@ function Chartview() {
                   <Current id={datamapping[floor][subView]}></Current>
                 </div>
                 <div className="aspect-auto max-w-[1200px] w-full border p-4">
-                  <Factor id={datamapping[floor][subView]}></Factor>
+                  <EnergyConsumed
+                    id={datamapping[floor][subView]}
+                  ></EnergyConsumed>
                 </div>
                 <div className="aspect-auto max-w-[1200px] w-full border p-4">
-                  <Potency id={datamapping[floor][subView]}></Potency>
+                  <Factor id={datamapping[floor][subView]}></Factor>
                 </div>
               </>
             )}

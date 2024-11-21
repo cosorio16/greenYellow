@@ -16,75 +16,86 @@ function Headernav() {
     clearDataFile();
   }, [floor, subView]);
 
-  const downloadUnifiedExcel = async (data) => {
+  const downloadExcelPerSheet = async (data) => {
     try {
-      const allEntries = [];
-      const headers = new Set();
+      const workbook = new ExcelJS.Workbook();
 
       for (const [key, valueArrays] of Object.entries(data)) {
         if (valueArrays && Array.isArray(valueArrays[0])) {
-          valueArrays[0].forEach((subArray, index) => {
-            if (Array.isArray(subArray)) {
-              const columnName =
-                valueArrays[0].length === 4 && index === 3
-                  ? `${key} Total`
-                  : `${key} ${index + 1}`;
-              subArray.forEach(({ x, y }) => {
-                allEntries.push({
-                  Fecha: x,
-                  Tema: columnName,
-                  Valor: typeof y === "number" ? y.toFixed(2) : y,
-                });
-                headers.add(columnName);
+          const worksheet = workbook.addWorksheet(key);
+
+          const headers = ["Fecha"];
+          valueArrays[0].forEach((_, index) => {
+            headers.push(
+              valueArrays[0].length === 4 && index === 3
+                ? "Total"
+                : `Valor ${index + 1}`
+            );
+          });
+
+          const headerRow = worksheet.addRow(headers);
+
+          headerRow.eachCell((cell) => {
+            cell.font = { bold: true, color: { argb: "FFFFFF" } };
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "404040" },
+            };
+            cell.border = {
+              top: { style: "thin", color: { argb: "D3D3D3" } },
+              left: { style: "thin", color: { argb: "D3D3D3" } },
+              bottom: { style: "thin", color: { argb: "D3D3D3" } },
+              right: { style: "thin", color: { argb: "D3D3D3" } },
+            };
+            cell.alignment = { horizontal: "center" };
+          });
+
+          const rows = {};
+          valueArrays[0].forEach((subArray) => {
+            subArray.forEach(({ x, y }) => {
+              const date = new Date(x).toLocaleString();
+              if (!rows[date]) {
+                rows[date] = [date];
+              }
+              rows[date].push(typeof y === "number" ? y.toFixed(2) : y || null);
+            });
+          });
+
+          Object.values(rows).forEach((rowValues) => {
+            if (rowValues.slice(1).some((value) => value !== null)) {
+              const row = worksheet.addRow(rowValues);
+
+              row.eachCell((cell) => {
+                cell.border = {
+                  top: { style: "thin", color: { argb: "D3D3D3" } },
+                  left: { style: "thin", color: { argb: "D3D3D3" } },
+                  bottom: { style: "thin", color: { argb: "D3D3D3" } },
+                  right: { style: "thin", color: { argb: "D3D3D3" } },
+                };
               });
             }
           });
+
+          worksheet.columns.forEach((column) => {
+            let maxLength = 0;
+            column.eachCell((cell) => {
+              if (cell.value) {
+                maxLength = Math.max(maxLength, cell.value.toString().length);
+              }
+            });
+            column.width = Math.min(maxLength + 5, 30);
+          });
+
+          worksheet.autoFilter = {
+            from: { row: 1, column: 1 },
+            to: { row: 1, column: headers.length },
+          };
         }
       }
 
-      allEntries.sort((a, b) => a.Fecha - b.Fecha);
-
-      const uniqueDates = [...new Set(allEntries.map((entry) => entry.Fecha))];
-      const excelData = uniqueDates.map((date) => {
-        const row = { Fecha: new Date(date).toLocaleString() };
-        headers.forEach((header) => {
-          const matchingEntry = allEntries.find(
-            (entry) => entry.Fecha === date && entry.Tema === header
-          );
-          row[header] = matchingEntry ? matchingEntry.Valor : "";
-        });
-
-        return row;
-      });
-
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Datos Unificados");
-
-      worksheet.addRow(["Fecha", ...Array.from(headers)]);
-
-      excelData.forEach((rowData) => {
-        const row = [
-          rowData.Fecha,
-          ...Array.from(headers).map((header) => rowData[header] || ""),
-        ];
-        worksheet.addRow(row);
-      });
-
-      worksheet.columns.forEach((column) => {
-        let maxLength = 0;
-        column.eachCell((cell) => {
-          if (cell.value) {
-            maxLength = Math.max(maxLength, cell.value.toString().length);
-          }
-        });
-        column.width = maxLength < 10 ? 10 : maxLength;
-      });
-
-      worksheet.autoFilter =
-        "A1:" + String.fromCharCode(64 + worksheet.columns.length) + "1";
-
       const today = new Date();
-      const fileName = `DatosUnificados-${today.getFullYear()}-${
+      const fileName = `${titleFile}-${today.getFullYear()}-${
         today.getMonth() + 1
       }-${today.getDate()}.xlsx`;
 
@@ -96,12 +107,10 @@ function Headernav() {
         link.click();
       });
     } catch (error) {
-      console.error(
-        "Error al generar el archivo unificado con ExcelJS:",
-        error
-      );
+      console.error("Error al generar el archivo con hojas por tema:", error);
     }
   };
+
   return (
     <header className="w-full min-h-fit flex flex-col gap-8font-semibold shadow-md z-40 fixed bg-white top-0 left-0">
       <div className="flex justify-between items-center border-b px-8 h-16 font-semibold">
@@ -487,7 +496,7 @@ function Headernav() {
           </button>
           {view == 3 && (
             <button
-              onClick={() => downloadUnifiedExcel(data)}
+              onClick={() => downloadExcelPerSheet(data)}
               className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all"
             >
               Descargar Datos
