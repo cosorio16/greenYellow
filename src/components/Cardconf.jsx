@@ -272,7 +272,7 @@ function Cardconf() {
 
       <div className=" p-6 flex flex-col gap-2 bg-gray-50 rounded">
         <p className="text-2xl">Configuración de gráficas</p>
-        <div className="flex items-center gap-5 justify-center flex-col xl:flex-row">
+        <div className="flex items-center gap-5 justify-between flex-col xl:flex-row">
           <div className="flex items-center gap-8">
             <p className="min-w-fit w-56  rounded py-2 font-medium flex items-center gap-4 relative">
               <svg

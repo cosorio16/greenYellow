@@ -113,7 +113,7 @@ function Headernav() {
 
   return (
     <header className="w-full min-h-fit flex flex-col font-semibold shadow-md z-40 fixed bg-white top-0 left-0">
-      <div className="flex flex-col gap-2 justify-between items-center border-b px-8 h-16 font-semibold">
+      <div className="flex  gap-2 justify-between items-center border-b px-8 h-16 font-semibold">
         <svg
           onClick={() => updateView(0)}
           width="149px"
@@ -512,8 +512,8 @@ function Headernav() {
           <Floorselect></Floorselect>
           <MeterSelect></MeterSelect>
         </div>
-        <div className="flex items-center xl:flex-row flex-col gap-4 w-full">
-          <div>
+        <div className="flex items-center xl:w-fit xl:flex-row flex-col gap-4 w-full">
+          <div className="inline xl:hidden">
             <MeterSelect></MeterSelect>
           </div>
           <div className="xl:flex items-center justify-center gap-2 hidden">

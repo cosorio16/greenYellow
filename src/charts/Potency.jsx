@@ -59,10 +59,10 @@ function Potency({ id }) {
     },
   };
 
-  const [data, setData] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
-  const [data4, setData4] = useState([]);
+const [data, setData] = useState(Array.from({ length: 20}, () => Math.floor(Math.random() * 100)));
+ const [data2, setData2] = useState(Array.from({ length: 20}, () => Math.floor(Math.random() * 100)));
+const [data3, setData3] = useState(Array.from({ length: 20}, () => Math.floor(Math.random() * 100)));
+ const [data4, setData4] = useState(Array.from({ length: 20}, () => Math.floor(Math.random() * 100)));
 
   const [selected, setSelected] = useState([
     {

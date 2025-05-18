@@ -61,7 +61,7 @@ function ComOrg({ id }) {
     },
   };
 
-  const [data, setData] = useState([]);
+const [data, setData] = useState(Array.from({ length: 20}, () => Math.floor(Math.random() * 100)));
 
   const [selected, setSelected] = useState([
     {
