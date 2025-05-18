@@ -28,7 +28,14 @@ function Cardconf() {
   const [dataInput, setDataInput] = useState([]);
   const [pisos, setPisos] = useState(piso5);
   const [options, setOptions] = useState([]);
-  const [names, setNames] = useState([]);
+  const [names, setNames] = useState([
+    "Medidor 1",
+    "Medidor 2",
+    "Sensor 1",
+    "Sensor 2",
+    "Sensor 3",
+    "Sensor 4",
+  ]);
   const [date, setDate] = useState({});
   const [time, setTime] = useState({});
   const months = [
@@ -46,23 +53,23 @@ function Cardconf() {
     "Diciembre",
   ];
 
-  useEffect(() => {
-    const callBackDate = (e) => {
-      setDate(e);
-    };
+  // useEffect(() => {
+  //   const callBackDate = (e) => {
+  //     setDate(e);
+  //   };
 
-    const callBackTime = (e) => {
-      setTime(e);
-    };
+  //   const callBackTime = (e) => {
+  //     setTime(e);
+  //   };
 
-    localbus.listen("object", "32/0/1", callBackTime);
-    localbus.listen("object", "32/0/2", callBackDate);
+  //   localbus.listen("object", "32/0/1", callBackTime);
+  //   localbus.listen("object", "32/0/2", callBackDate);
 
-    return () => {
-      localbus.unlisten("object", "32/0/1", callBackTime);
-      localbus.unlisten("object", "32/0/2", callBackDate);
-    };
-  }, []);
+  //   return () => {
+  //     localbus.unlisten("object", "32/0/1", callBackTime);
+  //     localbus.unlisten("object", "32/0/2", callBackDate);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const filteredInputs = dataInput.filter((d) => d !== undefined);
@@ -79,26 +86,26 @@ function Cardconf() {
     }
   }, [floor]);
 
-  useEffect(() => {
-    const currentNames = [...names];
+  // useEffect(() => {
+  //   const currentNames = [...names];
 
-    const createCallback = (index) => (e) => {
-      currentNames[index] = e;
-      setNames([...currentNames]);
-    };
+  //   const createCallback = (index) => (e) => {
+  //     currentNames[index] = e;
+  //     setNames([...currentNames]);
+  //   };
 
-    const listeners = pisos.map((p, index) => {
-      const callBack = createCallback(index);
-      localbus.listen("object", `${p}`, callBack);
-      return { address: p, callBack };
-    });
+  //   const listeners = pisos.map((p, index) => {
+  //     const callBack = createCallback(index);
+  //     localbus.listen("object", `${p}`, callBack);
+  //     return { address: p, callBack };
+  //   });
 
-    return () => {
-      listeners.forEach(({ address, callBack }) => {
-        localbus.unlisten("object", address, callBack);
-      });
-    };
-  }, [pisos]);
+  //   return () => {
+  //     listeners.forEach(({ address, callBack }) => {
+  //       localbus.unlisten("object", address, callBack);
+  //     });
+  //   };
+  // }, [pisos]);
 
   const [editing, setEditing] = useState(false);
 
@@ -163,11 +170,11 @@ function Cardconf() {
   };
 
   return (
-    <div className="flex flex-col w-[50%] gap-4 px-10 py-4 border-4 rounded-lg h-fit bg-white">
+    <div className="flex flex-col w-screen xl:w-[50%] gap-4 px-5 xl:px-10 py-4 border-4 rounded-lg h-fit bg-white">
       <div className=" p-6 flex flex-col gap-2 bg-gray-50 rounded">
         <p className="text-2xl">Configuración de fecha y hora</p>
-        <div className="flex items-center justify-between">
-          <div className="flex gap-4 items-center">
+        <div className="flex items-center flex-col gap-3 xl:flex-row justify-between">
+          <div className="flex gap-4 items-center w-full">
             <svg
               className="text-yellow-300"
               width="30"
@@ -187,16 +194,17 @@ function Cardconf() {
             </svg>
             <div className="flex flex-col gap-1">
               <p className="text-lg text-gray-500">Hora del Sistema</p>
-              <p className="font-semibold text-lg">
+              {/* <p className="font-semibold text-lg">
                 {time &&
                   `${time.hour < 10 ? `0${time.hour}` : time.hour}:${
                     time.minute < 10 ? `0${time.minute}` : time.minute
                   }:${time.second < 10 ? `0${time.second}` : time.second}`}
-              </p>
+              </p> */}
+              <p>10:10:10</p>
             </div>
           </div>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center w-full">
             <svg
               className="text-yellow-300"
               width="30"
@@ -210,14 +218,15 @@ function Cardconf() {
             </svg>
             <div className="flex flex-col gap-1">
               <p className="text-lg text-gray-500">Fecha del Sistema</p>
-              <p className="font-semibold text-lg">
+              {/* <p className="font-semibold text-lg">
                 {date && `${date.day} ${months[date.month - 1]}, ${date.year}`}
-              </p>
+              </p> */}
+              <p>18/05/2024</p>
             </div>
           </div>
 
           <button
-            className=" w-10 h-10 aspect-square rounded-full flex items-center justify-center bg-yellow-400 text-white "
+            className=" w-10 h-10 aspect-square rounded-full xl:flex items-center justify-center bg-yellow-400 text-white hidden"
             onClick={() => handleSetConfiguration()}
           >
             <svg width="25" height="25" viewBox="0 0 24 24">
@@ -236,7 +245,7 @@ function Cardconf() {
           <Floorselect></Floorselect>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-10">
+      <div className="grid xl:grid-cols-2 gap-2 xl:gap-10">
         {options.map((o, index) => (
           <div key={index}>
             <h1 className="text-gray-400 text-sm font-medium">{o}</h1>
@@ -263,7 +272,7 @@ function Cardconf() {
 
       <div className=" p-6 flex flex-col gap-2 bg-gray-50 rounded">
         <p className="text-2xl">Configuración de gráficas</p>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5 justify-center flex-col xl:flex-row">
           <div className="flex items-center gap-8">
             <p className="min-w-fit w-56  rounded py-2 font-medium flex items-center gap-4 relative">
               <svg
@@ -284,7 +293,7 @@ function Cardconf() {
                 </g>
               </svg>
               Ver Datos Locales
-              <div className="absolute bg-white shadow border w-[400px] z-50 bottom-full px-6 py-3 infocardLocal">
+              <div className="absolute bg-white shadow border w-72 xl:w-[400px] z-50 bottom-full px-6 py-3 infocardLocal">
                 <p className="text-sm">
                   Esta opción utiliza una base de datos local almacenada en el
                   dispositivo, donde se guarda la información generada por los
@@ -332,7 +341,7 @@ function Cardconf() {
                 </g>
               </svg>
               Ver Datos De Nube
-              <div className="absolute bg-white shadow border w-[400px] bottom-full px-6 py-3 infocardNube z-50">
+              <div className="absolute bg-white shadow border w-72 xl:w-[400px] bottom-full px-6 py-3 infocardNube z-50">
                 <p className="text-sm">
                   Esta función utiliza InfluxDB para proporcionar acceso a datos
                   precisos generados por los sensores en momentos específicos,

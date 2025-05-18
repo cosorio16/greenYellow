@@ -112,15 +112,15 @@ function Headernav() {
   };
 
   return (
-    <header className="w-full min-h-fit flex flex-col gap-8font-semibold shadow-md z-40 fixed bg-white top-0 left-0">
-      <div className="flex justify-between items-center border-b px-8 h-16 font-semibold">
+    <header className="w-full min-h-fit flex flex-col font-semibold shadow-md z-40 fixed bg-white top-0 left-0">
+      <div className="flex flex-col gap-2 justify-between items-center border-b px-8 h-16 font-semibold">
         <svg
           onClick={() => updateView(0)}
           width="149px"
           height="41px"
           viewBox="0 0 149 41"
           version="1.1"
-          className="cursor-pointer"
+          className="cursor-pointer hidden xl:inline"
         >
           <g id="Group-39-Copy">
             <g id="Group">
@@ -412,7 +412,7 @@ function Headernav() {
             </g>
           </g>
         </svg>
-        <div className="flex items-center gap-16 h-full">
+        <div className="xl:flex items-center gap-16 h-full hidden">
           <div className="flex gap-10 h-full">
             <button
               onClick={() => updateView(0)}
@@ -465,9 +465,35 @@ function Headernav() {
             </svg>
           </button>
         </div>
+        <div className="h-full w-full flex items-center justify-between xl:hidden">
+          <button
+            onClick={() => updateView(0)}
+            className="min-w-10 min-h-10 bg-gray-600 text-white flex items-center justify-center rounded-full hover:scale-105 transition-all active:scale-95 aspect-square"
+          >
+            <svg width="25" height="25" viewBox="0 0 24 24">
+              <path
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                d="M20 12H4m0 0l6-6m-6 6l6 6"
+              />
+            </svg>
+          </button>
+          <Floorselect></Floorselect>
+          <button onClick={() => updateView(1)} className="text-neutral-500">
+            <svg width="35" height="35" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M19.9 12.66a1 1 0 0 1 0-1.32l1.28-1.44a1 1 0 0 0 .12-1.17l-2-3.46a1 1 0 0 0-1.07-.48l-1.88.38a1 1 0 0 1-1.15-.66l-.61-1.83a1 1 0 0 0-.95-.68h-4a1 1 0 0 0-1 .68l-.56 1.83a1 1 0 0 1-1.15.66L5 4.79a1 1 0 0 0-1 .48L2 8.73a1 1 0 0 0 .1 1.17l1.27 1.44a1 1 0 0 1 0 1.32L2.1 14.1a1 1 0 0 0-.1 1.17l2 3.46a1 1 0 0 0 1.07.48l1.88-.38a1 1 0 0 1 1.15.66l.61 1.83a1 1 0 0 0 1 .68h4a1 1 0 0 0 .95-.68l.61-1.83a1 1 0 0 1 1.15-.66l1.88.38a1 1 0 0 0 1.07-.48l2-3.46a1 1 0 0 0-.12-1.17ZM18.41 14l.8.9l-1.28 2.22l-1.18-.24a3 3 0 0 0-3.45 2L12.92 20h-2.56L10 18.86a3 3 0 0 0-3.45-2l-1.18.24l-1.3-2.21l.8-.9a3 3 0 0 0 0-4l-.8-.9l1.28-2.2l1.18.24a3 3 0 0 0 3.45-2L10.36 4h2.56l.38 1.14a3 3 0 0 0 3.45 2l1.18-.24l1.28 2.22l-.8.9a3 3 0 0 0 0 3.98m-6.77-6a4 4 0 1 0 4 4a4 4 0 0 0-4-4m0 6a2 2 0 1 1 2-2a2 2 0 0 1-2 2"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
       <div className="flex gap-4 items-center justify-between px-8 py-2">
-        <div className="flex items-center gap-4">
+        <div className="xl:flex items-center gap-4 hidden">
           <button
             onClick={() => updateView(0)}
             className="min-w-10 min-h-10 bg-gray-600 text-white flex items-center justify-center rounded-full hover:scale-105 transition-all active:scale-95 aspect-square"
@@ -486,22 +512,27 @@ function Headernav() {
           <Floorselect></Floorselect>
           <MeterSelect></MeterSelect>
         </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => handleView()}
-            className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all"
-          >
-            Vista de {view == 2 && "Gráficas"}
-            {view == 3 && "Datos"}
-          </button>
-          {view == 3 && (
+        <div className="flex items-center xl:flex-row flex-col gap-4 w-full">
+          <div>
+            <MeterSelect></MeterSelect>
+          </div>
+          <div className="xl:flex items-center justify-center gap-2 hidden">
             <button
-              onClick={() => downloadExcelPerSheet(data)}
+              onClick={() => handleView()}
               className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all"
             >
-              Descargar Datos
+              Vista de {view == 2 && "Gráficas"}
+              {view == 3 && "Datos"}
             </button>
-          )}
+            {view == 3 && (
+              <button
+                onClick={() => downloadExcelPerSheet(data)}
+                className="border-transparent border items-center px-4 py-2 rounded-full bg-yellow-300 hover:border-yellow-300 hover:bg-transparent transition-all"
+              >
+                Descargar Datos
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </header>

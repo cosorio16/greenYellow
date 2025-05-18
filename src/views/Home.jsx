@@ -5,7 +5,7 @@ function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header></Header>
-      <main className="p-10 flex flex-col gap-4 bg-gray-100 h-full grow pt-24">
+      <main className="p-4 lg:p-10 flex flex-col gap-4 bg-gray-100 h-full grow pt-24">
         <h1 className="flex items-center gap-4 text-4xl font-light">
           <svg width="35" height="35" viewBox="0 0 24 24">
             <path
@@ -18,7 +18,7 @@ function Home() {
           </svg>
           Medición
         </h1>
-        <div className="grid-cols-2 grid gap-8 grow">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 grow">
           <Cardnav floorName={"Piso 5"} floorCard={5}></Cardnav>
           <Cardnav floorName={"Piso 7"} floorCard={7}></Cardnav>
         </div>

@@ -17,7 +17,7 @@ function Floorselect() {
 
   return (
     <div
-      className="px-4 py-2 flex items-center justify-between text-lg relative gap-4 cursor-pointer hover:border-b transition-all border-b border-transparent hover:border-gray-300 min-w-fit w-44"
+      className="px-4 py-2 flex items-center justify-between text-lg relative gap-4 cursor-pointer hover:border-b transition-all border-b border-transparent hover:border-gray-300 min-w-fit w-44 z-30 bg-neutral-50 rounded"
       onClick={() => setShowOptions(!showOptions)}
     >
       <svg width="25" height="25" viewBox="0 0 24 24">
@@ -46,7 +46,7 @@ function Floorselect() {
         <div className="flex flex-col absolute top-11 bg-white w-full left-0  border border-gray-300 rounded">
           <div
             onClick={() => handleFloor(5)}
-            className={`hover:bg-yellow-200 transition-all py-2 cursor-pointer border-b px-4 ${
+            className={`hover:bg-yellow-200 transition-all py-2 cursor-pointer border-b px-4 bg-white ${
               floor == 5 && "bg-yellow-300"
             }`}
           >
@@ -54,7 +54,7 @@ function Floorselect() {
           </div>
           <div
             onClick={() => updateFloor(7)}
-            className={`hover:bg-yellow-200 transition-all py-2 cursor-pointer border-b px-4 ${
+            className={`hover:bg-yellow-200 transition-all py-2 cursor-pointer border-b px-4 bg-white ${
               floor == 7 && "bg-yellow-300"
             }`}
           >

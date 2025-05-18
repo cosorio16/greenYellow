@@ -47,34 +47,34 @@ function Meterview() {
     );
   }, [floor, subView]);
 
-  useEffect(() => {
-    let currentValues = [...values];
+  // useEffect(() => {
+  //   let currentValues = [...values];
 
-    const createCallback = (index) => (e) => {
-      if (typeof e === "number" && !Number.isInteger(e)) {
-        currentValues[index] = e.toFixed(2);
-      } else if (e === true) {
-        currentValues[index] = "Ocupado";
-      } else if (e === false) {
-        currentValues[index] = "Desocupado";
-      } else {
-        currentValues[index] = e;
-      }
-      setValues([...currentValues]);
-    };
+  //   const createCallback = (index) => (e) => {
+  //     if (typeof e === "number" && !Number.isInteger(e)) {
+  //       currentValues[index] = e.toFixed(2);
+  //     } else if (e === true) {
+  //       currentValues[index] = "Ocupado";
+  //     } else if (e === false) {
+  //       currentValues[index] = "Desocupado";
+  //     } else {
+  //       currentValues[index] = e;
+  //     }
+  //     setValues([...currentValues]);
+  //   };
 
-    const listeners = currentMeter.map((m, index) => {
-      const callback = createCallback(index);
-      localbus.listen("object", `${m}`, callback);
-      return { address: m, callback };
-    });
+  //   const listeners = currentMeter.map((m, index) => {
+  //     const callback = createCallback(index);
+  //     localbus.listen("object", `${m}`, callback);
+  //     return { address: m, callback };
+  //   });
 
-    return () => {
-      listeners.forEach(({ address, callback }) => {
-        localbus.unlisten("object", address, callback);
-      });
-    };
-  }, [currentMeter]);
+  //   return () => {
+  //     listeners.forEach(({ address, callback }) => {
+  //       localbus.unlisten("object", address, callback);
+  //     });
+  //   };
+  // }, [currentMeter]);
 
   const handleSetTiming = () => {
     const inputMeter = dataMapping[floor][subView];
@@ -113,24 +113,21 @@ function Meterview() {
   return (
     <div className="flex flex-col min-h-screen">
       <Headernav />
-      <main className="p-8 flex flex-col gap-5 grow bg-gray-100 pt-44">
-        <div className="border-2 flex flex-col gap-4 px-10 py-6 bg-white rounded-xl">
-          <div className="grid grid-cols-4 gap-4  pb-4">
+      <main className="p-1 lg:p-8 flex flex-col gap-5 grow bg-gray-100 pt-36 xl:pt-44">
+        <div className="border-2 flex flex-col gap-4 px-4 lg:px-10 py-6 bg-white rounded-xl">
+          <div className="grid grid-cols-2 xl:grid-cols-4 items-start gap-4  pb-4">
             {topics.map((t, index) => (
               <div key={index}>
-                <h1 className="text-sm font-medium text-gray-500 capitalize">
+                <h1 className="text-sm font-medium text-gray-500 capitalize line-clamp-1 lg:line-clamp-none">
                   {t}
                 </h1>
-                <p
-                  onClick={(e) => console.log(e)}
-                  className="px-4 py-2 rounded bg-gray-100 text-gray-700"
-                >
+                <p className="px-4 py-2 rounded bg-gray-100 text-gray-700">
                   {`${values[index] || 0} ${getSigno(t)}`}
                 </p>
               </div>
             ))}
             {subView > 1 && (
-              <div className="flex items-center gap-4 w-full">
+              <div className="hidden xl:flex items-center gap-4 w-full">
                 <svg
                   className="text-yellow-300"
                   width="35"

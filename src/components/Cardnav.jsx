@@ -22,30 +22,30 @@ function Cardnav({ floorName, floorCard }) {
     updateSubView(v);
   };
 
-  useEffect(() => {
-    const pisos = floorCard == 5 ? piso5 : piso7;
-    const currentNames = [...namesNav];
+  // useEffect(() => {
+  //   const pisos = floorCard == 5 ? piso5 : piso7;
+  //   const currentNames = [...namesNav];
 
-    const createCallback = (index) => (e) => {
-      currentNames[index] = e;
-      setNamesNav([...currentNames]);
-    };
+  //   const createCallback = (index) => (e) => {
+  //     currentNames[index] = e;
+  //     setNamesNav([...currentNames]);
+  //   };
 
-    const listeners = pisos.map((p, index) => {
-      const callback = createCallback(index);
-      localbus.listen("object", `${p}`, callback);
-      return { address: p, callback };
-    });
+  //   const listeners = pisos.map((p, index) => {
+  //     const callback = createCallback(index);
+  //     localbus.listen("object", `${p}`, callback);
+  //     return { address: p, callback };
+  //   });
 
-    return () => {
-      listeners.forEach(({ address, callback }) => {
-        localbus.unlisten("object", address, callback);
-      });
-    };
-  }, []);
+  //   return () => {
+  //     listeners.forEach(({ address, callback }) => {
+  //       localbus.unlisten("object", address, callback);
+  //     });
+  //   };
+  // }, []);
 
   return (
-    <div className=" px-10 py-8 flex flex-col gap-4 bg-white h-fit rounded-xl border-gray-200 border-4 ">
+    <div className="px-5 xl:px-10 py-8 flex flex-col gap-4 bg-white h-fit rounded-xl border-gray-200 border-4 ">
       <h1 className="flex items-center gap-4 text-2xl font-semibold">
         <svg width="25" height="25" viewBox="0 0 24 24">
           <g

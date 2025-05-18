@@ -13,33 +13,33 @@ function Footer() {
       : setPiso(["32/1/41", "32/1/43"]);
   }, [floor]);
 
-  useEffect(() => {
-    let currentValues = [...values];
+  // useEffect(() => {
+  //   let currentValues = [...values];
 
-    const createCallback = (index) => (e) => {
-      if (typeof e == "number" && !Number.isInteger(e)) {
-        currentValues[index] = e.toFixed(2);
-      } else {
-        currentValues[index] = e;
-      }
-      setValues([...currentValues]);
-    };
+  //   const createCallback = (index) => (e) => {
+  //     if (typeof e == "number" && !Number.isInteger(e)) {
+  //       currentValues[index] = e.toFixed(2);
+  //     } else {
+  //       currentValues[index] = e;
+  //     }
+  //     setValues([...currentValues]);
+  //   };
 
-    const listeners = piso.map((p, index) => {
-      const callback = createCallback(index);
-      localbus.listen("object", `${p}`, callback);
-      return { address: p, callback };
-    });
+  //   const listeners = piso.map((p, index) => {
+  //     const callback = createCallback(index);
+  //     localbus.listen("object", `${p}`, callback);
+  //     return { address: p, callback };
+  //   });
 
-    return () => {
-      listeners.forEach(({ address, callback }) => {
-        localbus.unlisten("object", address, callback);
-      });
-    };
-  }, [piso]);
+  //   return () => {
+  //     listeners.forEach(({ address, callback }) => {
+  //       localbus.unlisten("object", address, callback);
+  //     });
+  //   };
+  // }, [piso]);
 
   return (
-    <footer className="flex justify-center gap-32 items-center py-4 bg-gray-100 border-t-2">
+    <footer className="hidden lg:flex justify-center gap-32 items-center py-4 bg-gray-100 border-t-2">
       <div className="flex gap-2 items-center border bg-gray-50 h-full px-8 py-6 rounded">
         <svg
           className="text-yellow-300 "

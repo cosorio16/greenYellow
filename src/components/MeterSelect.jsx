@@ -7,7 +7,14 @@ function MeterSelect() {
   const [showOptions, setShowOptions] = useState(false);
 
   const [sections, setSections] = useState([]);
-  const [sectionsNames, setSectionsNames] = useState([]);
+  const [sectionsNames, setSectionsNames] = useState([
+    "Medidor 1",
+    "Medidor 2",
+    "Sensor 1",
+    "Sensor 2",
+    "Sensor 3",
+    "Sensor 4",
+  ]);
 
   const piso5 = ["33/0/1", "33/0/2", "33/0/5", "33/0/6", "33/0/7", "33/0/11"];
   const piso7 = ["33/0/3", "33/0/4", "33/0/9", "33/0/10", "33/0/8", "33/0/12"];
@@ -16,26 +23,26 @@ function MeterSelect() {
     floor == 5 ? setSections(piso5) : setSections(piso7);
   }, [floor]);
 
-  useEffect(() => {
-    const currentNamesSections = [...sectionsNames];
+  // useEffect(() => {
+  //   const currentNamesSections = [...sectionsNames];
 
-    const createCallBack = (index) => (e) => {
-      currentNamesSections[index] = e;
-      setSectionsNames([...currentNamesSections]);
-    };
+  //   const createCallBack = (index) => (e) => {
+  //     currentNamesSections[index] = e;
+  //     setSectionsNames([...currentNamesSections]);
+  //   };
 
-    const listeners = sections.map((s, index) => {
-      const callback = createCallBack(index);
-      localbus.listen("object", `${s}`, callback);
-      return { address: s, callback };
-    });
+  //   const listeners = sections.map((s, index) => {
+  //     const callback = createCallBack(index);
+  //     localbus.listen("object", `${s}`, callback);
+  //     return { address: s, callback };
+  //   });
 
-    return () => {
-      listeners.forEach(({ address, callback }) => {
-        localbus.unlisten("object", address, callback);
-      });
-    };
-  }, [sections]);
+  //   return () => {
+  //     listeners.forEach(({ address, callback }) => {
+  //       localbus.unlisten("object", address, callback);
+  //     });
+  //   };
+  // }, [sections]);
 
   useEffect(() => {
     addTitle(sectionsNames[subView]);
@@ -43,7 +50,7 @@ function MeterSelect() {
 
   return (
     <div
-      className="border-b border-transparent px-4 py-2 flex items-center justify-between text-lg relative transition-all cursor-pointer gap-4 min-w-fit w-72 hover:border-gray-300"
+      className="border-b border-transparent px-4 py-2 flex items-center justify-between text-lg relative transition-all cursor-pointer gap-4 min-w-fit w-72 hover:border-gray-300 bg-neutral-50 rounded"
       onClick={() => setShowOptions(!showOptions)}
     >
       {subView < 2 ? (
